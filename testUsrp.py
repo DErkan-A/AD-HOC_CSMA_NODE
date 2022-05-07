@@ -61,7 +61,7 @@ class UsrpApplicationLayer(GenericModel):
         payload ="DATA: BMSG-" + str(self.counter)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
-         print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
+        print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
         # time.sleep(3)
         self.send_down(evt)
         #print("Starting broadcast")
