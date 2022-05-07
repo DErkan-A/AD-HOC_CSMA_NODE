@@ -21,12 +21,8 @@ from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCs
 
 # define your own message types
 class ApplicationLayerMessageTypes(Enum):
-    BROADCAST = "BROADCAST"
-
-
-# define your own message header structure
-class ApplicationLayerMessageHeader(GenericMessageHeader):
-    pass
+    DATA = "DATA"
+    ACK = "ACK"
 
 
 class UsrpApplicationLayerEventTypes(Enum):
@@ -46,26 +42,23 @@ class UsrpApplicationLayer(GenericModel):
         self.send_down(Event(self, EventTypes.MFRT, eventobj.eventcontent))
     
     def on_message_from_bottom(self, eventobj: Event):
-        evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-        print(f"I am Node.{self.componentinstancenumber}, received from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")    
-        if self.componentinstancenumber == 1:
-            evt.eventcontent.header.messageto = 0
-            evt.eventcontent.header.messagefrom = 1
-        else:
-            evt.eventcontent.header.messageto = 1
-            evt.eventcontent.header.messagefrom = 0
-        evt.eventcontent.payload = eventobj.eventcontent.payload
-        #print(f"I am {self.componentname}.{self.componentinstancenumber}, sending down eventcontent={eventobj.eventcontent.payload}\n")
-        self.send_down(evt)  # PINGPONG
-    
+        evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)        
+        if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
+            if(eventobj.eventcontent.header.messagetype = ApplicationLayerMessageTypes.DATA):
+                print(f"I am Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
+                evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
+                evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
+                evt.eventcontent.header.messagefrom = self.componentinstancenumber
+                evt.eventcontent.payload ="ACK for: " + eventobj.eventcontent.payload
+                #print(f"I am {self.componentname}.{self.componentinstancenumber}, sending down eventcontent={eventobj.eventcontent.payload}\n")
+                self.send_down(evt)  # PINGPONG
+            elif(eventobj.eventcontent.header.messagetype = ACK):
+                print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
+
     def on_startbroadcast(self, eventobj: Event):
-        if self.componentinstancenumber == 1:
-            hdr = ApplicationLayerMessageHeader(ApplicationLayerMessageTypes.BROADCAST, 1, 0)
-        else:
-            hdr = ApplicationLayerMessageHeader(ApplicationLayerMessageTypes.BROADCAST, 0, 1)
-        self.counter = self.counter + 1
-        
-        payload = "BMSG-" + str(self.counter)
+        hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , random.randint(0, 3))
+        self.counter = self.counter + 1       
+        payload ="DATA: BMSG-" + str(self.counter)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
         # time.sleep(3)
@@ -121,10 +114,10 @@ def main():
     topo.start()
     i = 0
     while(i < 10):
-        topo.nodes[1].appl.send_self(Event(topo.nodes[0], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        topo.nodes[1].appl.send_self(Event(topo.nodes[random.randint(0,3)], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(1)
         i = i + 1
-
+    time.sleep(20)
 
 if __name__ == "__main__":
     main()
