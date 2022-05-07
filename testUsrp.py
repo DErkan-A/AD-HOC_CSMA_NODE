@@ -43,10 +43,10 @@ class UsrpApplicationLayer(GenericModel):
     
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-        print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")        
+        #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")        
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
-                #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
+                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
@@ -120,7 +120,7 @@ def main():
     while(i < 10):
         random_node = random.randint(0,3)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
-        time.sleep(1)
+        time.sleep(2)
         i = i + 1
     time.sleep(20)
 
