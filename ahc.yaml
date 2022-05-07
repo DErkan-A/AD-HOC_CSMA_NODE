@@ -6,7 +6,7 @@
 # currently developing our system every day, there might be problems as a result, installing the latest version of
 # adhoccomputing library is always guarantee for simulation. 
 image: cengwins/ahc-uhd-image
-command: pip install adhoccomputing==2.1.1 --no-cache-dir && python3 test.py
+command: pip install adhoccomputing==2.1.1 --no-cache-dir && python3 testUsrp.py
 
 env:
   PYTHONUNBUFFERED: "1"
