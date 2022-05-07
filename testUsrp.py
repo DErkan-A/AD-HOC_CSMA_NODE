@@ -52,7 +52,7 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.payload ="ACK for: " + eventobj.eventcontent.payload
                 #print(f"I am {self.componentname}.{self.componentinstancenumber}, sending down eventcontent={eventobj.eventcontent.payload}\n")
                 self.send_down(evt)  # PINGPONG
-            elif(eventobj.eventcontent.header.messagetype == ACK):
+            elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
 
     def on_startbroadcast(self, eventobj: Event):
