@@ -44,7 +44,7 @@ class UsrpApplicationLayer(GenericModel):
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)        
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
-            if(eventobj.eventcontent.header.messagetype = ApplicationLayerMessageTypes.DATA):
+            if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 print(f"I am Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
@@ -52,7 +52,7 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.payload ="ACK for: " + eventobj.eventcontent.payload
                 #print(f"I am {self.componentname}.{self.componentinstancenumber}, sending down eventcontent={eventobj.eventcontent.payload}\n")
                 self.send_down(evt)  # PINGPONG
-            elif(eventobj.eventcontent.header.messagetype = ACK):
+            elif(eventobj.eventcontent.header.messagetype == ACK):
                 print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
 
     def on_startbroadcast(self, eventobj: Event):
