@@ -114,7 +114,7 @@ def main():
     topo.start()
     i = 0
     while(i < 10):
-        topo.nodes[1].appl.send_self(Event(topo.nodes[random.randint(0,3)], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        topo.nodes[random.randint(0,3)].appl.send_self(Event(topo.nodes[random.randint(0,3)], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(1)
         i = i + 1
     time.sleep(20)
