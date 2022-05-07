@@ -42,18 +42,18 @@ class UsrpApplicationLayer(GenericModel):
         self.send_down(Event(self, EventTypes.MFRT, eventobj.eventcontent))
     
     def on_message_from_bottom(self, eventobj: Event):
-        evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)        
+        evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
+        print(f"I am Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")        
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
-                print(f"I am Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
+                #print(f"I am Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload ="ACK for: " + eventobj.eventcontent.payload
-                #print(f"I am {self.componentname}.{self.componentinstancenumber}, sending down eventcontent={eventobj.eventcontent.payload}\n")
                 self.send_down(evt)  # PINGPONG
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
-                print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
+                print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
     def on_startbroadcast(self, eventobj: Event):
         destination_node = random.randint(0,3)
