@@ -61,6 +61,7 @@ class UsrpApplicationLayer(GenericModel):
         payload ="DATA: BMSG-" + str(self.counter)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
+         print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
         # time.sleep(3)
         self.send_down(evt)
         #print("Starting broadcast")
@@ -114,7 +115,8 @@ def main():
     topo.start()
     i = 0
     while(i < 10):
-        topo.nodes[random.randint(0,3)].appl.send_self(Event(topo.nodes[random.randint(0,3)], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        random_node = random.randint(0,3)
+        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(1)
         i = i + 1
     time.sleep(20)
