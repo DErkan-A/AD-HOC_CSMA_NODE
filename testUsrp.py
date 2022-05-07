@@ -56,7 +56,10 @@ class UsrpApplicationLayer(GenericModel):
                 print(f"I am Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} a message: {eventobj.eventcontent.payload}")
 
     def on_startbroadcast(self, eventobj: Event):
-        hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , random.randint(0, 3))
+        destination_node = random.randint(0,3)
+        while destination_node == self.componentinstancenumber:
+            destination_node = random.randint(0,3)
+        hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.counter = self.counter + 1       
         payload ="DATA: BMSG-" + str(self.counter)
         broadcastmessage = GenericMessage(hdr, payload)
