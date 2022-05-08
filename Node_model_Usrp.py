@@ -1,3 +1,7 @@
+#Disclaimer!!!
+#Written by Doğu Erkan Arkadaş by modifying the physical layer tests from https://github.com/cengwins/ahc_v2_tests/tree/main/PhysicalLayers
+#About half of the functions are not majorly changed
+
 import os
 import sys
 import time, random, math
@@ -19,43 +23,49 @@ from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCs
 #framers = FramerObjects()
 
 
-# define your own message types
+# Message types that will be carried in eventcontent header
 class ApplicationLayerMessageTypes(Enum):
     DATA = "DATA"
     ACK = "ACK"
 
-
+#Application level new event to generate packets from the main thread, also needs a new handler
 class UsrpApplicationLayerEventTypes(Enum):
     STARTBROADCAST = "startbroadcast"
 
-
+#Our aplication layer for nodes, basically all the logic happens here
 class UsrpApplicationLayer(GenericModel):
     def on_init(self, eventobj: Event):
         self.counter = 0
     
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+        #new event handler for packet generation, same otherwise
         self.eventhandlers[UsrpApplicationLayerEventTypes.STARTBROADCAST] = self.on_startbroadcast
 
     def on_message_from_top(self, eventobj: Event):
-    # print(f"I am {self.componentname}.{self.componentinstancenumber},sending down eventcontent={eventobj.eventcontent}\n")
         self.send_down(Event(self, EventTypes.MFRT, eventobj.eventcontent))
     
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-        #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")        
+        #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
+        #If the message was targetting this node        
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
+            #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
+                #Print the received DATA message content
                 print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload =eventobj.eventcontent.payload
-                self.send_down(evt)  # PINGPONG
+                self.send_down(evt)  # Send the ACK
+            #Print the message content if you receive an ACK message    
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
+    #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
+        #select a random destination node that is not yourself
         destination_node = random.randint(0,3)
         while destination_node == self.componentinstancenumber:
             destination_node = random.randint(0,3)
@@ -71,7 +81,6 @@ class UsrpApplicationLayer(GenericModel):
     
          
 class UsrpNode(GenericModel):
-    counter = 0
     def on_init(self, eventobj: Event):
         pass
     
@@ -79,6 +88,7 @@ class UsrpNode(GenericModel):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
         # SUBCOMPONENTS
         
+        #Configure the p-persisten MAC
         macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
         
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
@@ -90,6 +100,7 @@ class UsrpNode(GenericModel):
         self.components.append(self.mac)
 
         # CONNECTIONS AMONG SUBCOMPONENTS
+        # Connections are simple. From top to bottom NODE-> APP -> MAC -> Phy -> NODE
         self.appl.connect_me_to_component(ConnectorTypes.UP, self) #Not required if nodemodel will do nothing
         self.appl.connect_me_to_component(ConnectorTypes.DOWN, self.mac)
         
@@ -117,6 +128,7 @@ def main():
 
     topo.start()
     i = 0
+    #test for only 1 random node sending a message to another random node with sufficent waiting between messages
     while(i < 10):
         random_node = random.randint(0,3)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
