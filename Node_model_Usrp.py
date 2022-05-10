@@ -118,7 +118,7 @@ class UsrpNode(GenericModel):
         # self.connect_me_to_component(ConnectorTypes.DOWN, self.appl)
     
 def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time, counter_reset):
-    print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",mumber_of_messages)
+    print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
     topo.start()
     i = 0
     #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
