@@ -56,17 +56,17 @@ class UsrpApplicationLayer(GenericModel):
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 self.received_data_counter += 1
                 #Print the received DATA message content
-                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
+                #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload =eventobj.eventcontent.payload
                 self.send_down(evt)  # Send the ACK
                 self.sent_ack_counter += 1
-            #Print the message content if you receive an ACK message    
+            #Print the message content if you receive an ACK message and increase the counter   
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 self.received_ack_counter += 1
-                print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
+                #print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
     #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
@@ -79,10 +79,8 @@ class UsrpApplicationLayer(GenericModel):
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
-        print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
-        # time.sleep(3)
+        #print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
         self.send_down(evt)
-        #print("Starting broadcast")
     
          
 class UsrpNode(GenericModel):
@@ -123,9 +121,10 @@ class UsrpNode(GenericModel):
 
 def main():
     topo = Topology()
+    number_of_nodes = 4
 # Note that the topology has to specific: usrp winslab_b210_0 is run by instance 0 of the component
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
-    topo.construct_winslab_topology_without_channels(4, UsrpNode)
+    topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
   
   # time.sleep(1)
@@ -137,7 +136,7 @@ def main():
     print("Reporting the overall statistics")
     print("Testing channel failure rate by sending messages 1 by 1 with time inbetween")
     while(i < 100):
-        random_node = random.randint(0,3)
+        random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(0.1)
         i = i + 1
@@ -146,7 +145,7 @@ def main():
     total_ack_sent = 0
     total_data_received = 0
     total_ack_received = 0
-    for node in range(4):
+    for node in range(number_of_nodes):
         node = topo.nodes[node].appl
         total_data_sent +=node.sent_data_counter
         total_ack_sent +=node.sent_ack_counter
