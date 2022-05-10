@@ -79,7 +79,7 @@ class UsrpApplicationLayer(GenericModel):
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
-        print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
+        print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
         # time.sleep(3)
         self.send_down(evt)
         #print("Starting broadcast")
@@ -134,15 +134,29 @@ def main():
     topo.start()
     i = 0
     #test for only 1 random node sending a message to another random node with sufficent waiting between messages, this basically tests failure rate
-    while(i < 10):
+    print("Reporting the overall statistics")
+    print("Testing channel failure rate by sending messages 1 by 1 with time inbetween")
+    while(i < 100):
         random_node = random.randint(0,3)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(0.1)
         i = i + 1
     time.sleep(1)
+    total_data_sent = 0
+    total_ack_sent = 0
+    total_data_received = 0
+    total_ack_received = 0
     for node in range(4):
         node = topo.nodes[node].appl
+        total_data_sent +=sent_data_counter
+        total_ack_sent +=sent_ack_counter
+        total_data_received += received_data_counter
+        total_ack_received +=received_ack_counter
         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
+    data_success_rate = total_data_received / total_data_sent
+    ack_success_rate = total_ack_received/total_ack_sent 
+    total_success_rate = (total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent)
+    print("Data message success rate is:",data_success_rate, " ACK message success rate is:",ack_success_rate, " Total success rate is:",total_success_rate)
 if __name__ == "__main__":
     main()
