@@ -77,8 +77,10 @@ class UsrpApplicationLayer(GenericModel):
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
+        print("size of payload is:"sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
+        print("size of event is:",sys.getsizeof(evt))
         print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
         self.send_down(evt)
     
@@ -159,7 +161,7 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
   
-    run_test(topo,0.1,number_of_nodes,100,1,1)
+    run_test(topo,0.1,number_of_nodes,10,1,1)
 
 
 if __name__ == "__main__":
