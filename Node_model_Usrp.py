@@ -128,13 +128,13 @@ def main():
 
     topo.start()
     i = 0
-    #test for only 1 random node sending a message to another random node with sufficent waiting between messages
+    #test for only 1 random node sending a message to another random node with sufficent waiting between messages, this basically tests failure rate
     while(i < 10):
         random_node = random.randint(0,3)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
-        time.sleep(2)
+        time.sleep(0.1)
         i = i + 1
-    time.sleep(20)
+    time.sleep(1)
 
 if __name__ == "__main__":
     main()
