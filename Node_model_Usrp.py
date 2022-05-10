@@ -142,7 +142,7 @@ def main():
     time.sleep(1)
     for node in range(4):
         node = topo.nodes[node].appl
-         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
+        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
 if __name__ == "__main__":
     main()
