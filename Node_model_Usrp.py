@@ -148,10 +148,10 @@ def main():
     total_ack_received = 0
     for node in range(4):
         node = topo.nodes[node].appl
-        total_data_sent +=sent_data_counter
-        total_ack_sent +=sent_ack_counter
-        total_data_received += received_data_counter
-        total_ack_received +=received_ack_counter
+        total_data_sent +=node.sent_data_counter
+        total_ack_sent +=node.sent_ack_counter
+        total_data_received += node.received_data_counter
+        total_ack_received +=node.received_ack_counter
         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
     data_success_rate = total_data_received / total_data_sent
