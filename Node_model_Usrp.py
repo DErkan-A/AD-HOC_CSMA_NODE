@@ -119,13 +119,13 @@ class UsrpNode(GenericModel):
     
 def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time, counter_reset):
     print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
-    topo.start()
+    my_topology.start()
     i = 0
     #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
     print("Reporting the overall statistics")
     while(i < number_of_messages):
         random_node = random.randint(0,number_of_nodes-1)
-        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        my_topology.nodes[random_node].appl.send_self(Event(my_topology.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(wait_time)
         i = i + 1
     time.sleep(finish_wait_time)
@@ -134,7 +134,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
     total_data_received = 0
     total_ack_received = 0
     for node in range(number_of_nodes):
-        node = topo.nodes[node].appl
+        node = my_topology.nodes[node].appl
         total_data_sent +=node.sent_data_counter
         total_ack_sent +=node.sent_ack_counter
         total_data_received += node.received_data_counter
