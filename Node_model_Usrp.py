@@ -135,7 +135,7 @@ def main():
     #test for only 1 random node sending a message to another random node with sufficent waiting between messages, this basically tests failure rate
     print("Reporting the overall statistics")
     print("Testing channel failure rate by sending messages 1 by 1 with time inbetween")
-    while(i < 100):
+    while(i < 1000):
         random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(0.1)
@@ -153,9 +153,20 @@ def main():
         total_ack_received +=node.received_ack_counter
         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
-    data_success_rate = total_data_received / total_data_sent
-    ack_success_rate = total_ack_received/total_ack_sent 
-    total_success_rate = (total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent)
-    print("Data message success rate is:",data_success_rate, " ACK message success rate is:",ack_success_rate, " Total success rate is:",total_success_rate)
+    data_fail_rate = 1-(total_data_received / total_data_sent)
+    ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
+    total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
+    print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
+
+    print("Testing channel failure rate with possible collisions by immediatly issueing many random sends")
+    while(i < 1000):
+        random_node = random.randint(0,number_of_nodes-1)
+        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        i = i + 1
+    time.sleep(10)
+    data_fail_rate = 1-(total_data_received / total_data_sent)
+    ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
+    total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
+    print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)    
 if __name__ == "__main__":
     main()
