@@ -168,7 +168,7 @@ def main():
         random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         i = i + 1
-    time.sleep(11)
+    time.sleep(100)
     
     for node in range(number_of_nodes):
         node = topo.nodes[node].appl
