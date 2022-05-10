@@ -56,7 +56,7 @@ class UsrpApplicationLayer(GenericModel):
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 self.received_data_counter += 1
                 #Print the received DATA message content
-                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
+                #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
@@ -66,7 +66,7 @@ class UsrpApplicationLayer(GenericModel):
             #Print the message content if you receive an ACK message and increase the counter   
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 self.received_ack_counter += 1
-                print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
+                #print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
     #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
@@ -77,11 +77,10 @@ class UsrpApplicationLayer(GenericModel):
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
-        print("size of payload is:",sys.getsizeof(payload))
+        #print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
-        print("size of event is:",sys.getsizeof(evt))
-        print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
+        #print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
         self.send_down(evt)
     
          
@@ -161,7 +160,7 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
   
-    run_test(topo,0.1,number_of_nodes,10,1,1)
+    run_test(topo,1,number_of_nodes,400,1,1)
 
 
 if __name__ == "__main__":
