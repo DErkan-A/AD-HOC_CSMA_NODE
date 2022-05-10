@@ -54,7 +54,7 @@ class UsrpApplicationLayer(GenericModel):
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
-                self.received_data_counter + = 1
+                self.received_data_counter += 1
                 #Print the received DATA message content
                 print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
