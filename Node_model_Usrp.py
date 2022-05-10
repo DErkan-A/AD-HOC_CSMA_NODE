@@ -135,7 +135,7 @@ def main():
     #test for only 1 random node sending a message to another random node with sufficent waiting between messages, this basically tests failure rate
     print("Reporting the overall statistics")
     print("Testing channel failure rate by sending messages 1 by 1 with time inbetween")
-    while(i < 1000):
+    while(i < 100):
         random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(0.1)
@@ -159,11 +159,11 @@ def main():
     print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
 
     print("Testing channel failure rate with possible collisions by immediatly issueing many random sends")
-    while(i < 1000):
+    while(i < 100):
         random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         i = i + 1
-    time.sleep(10)
+    time.sleep(11)
     data_fail_rate = 1-(total_data_received / total_data_sent)
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
