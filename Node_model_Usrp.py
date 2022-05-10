@@ -117,7 +117,39 @@ class UsrpNode(GenericModel):
         # self.phy.connect_me_to_component(ConnectorTypes.DOWN, self)
         # self.connect_me_to_component(ConnectorTypes.DOWN, self.appl)
     
-        
+def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time, counter_reset):
+    print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",mumber_of_messages)
+    topo.start()
+    i = 0
+    #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
+    print("Reporting the overall statistics")
+    while(i < number_of_messages):
+        random_node = random.randint(0,number_of_nodes-1)
+        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
+        time.sleep(wait_time)
+        i = i + 1
+    time.sleep(finish_wait_time)
+    total_data_sent = 0
+    total_ack_sent = 0
+    total_data_received = 0
+    total_ack_received = 0
+    for node in range(number_of_nodes):
+        node = topo.nodes[node].appl
+        total_data_sent +=node.sent_data_counter
+        total_ack_sent +=node.sent_ack_counter
+        total_data_received += node.received_data_counter
+        total_ack_received +=node.received_ack_counter
+        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
+        if counter_reset:
+            node.sent_data_counter = 0
+            node.sent_ack_counter = 0
+            node.received_data_counter = 0
+            node.received_ack_counter = 0
+
+    data_fail_rate = 1-(total_data_received / total_data_sent)
+    ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
+    total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
+    print("Data message failure rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)         
 
 def main():
     topo = Topology()
@@ -127,59 +159,8 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
   
-  # time.sleep(1)
-  # topo.nodes[0].send_self(Event(topo.nodes[0], UsrpNodeEventTypes.STARTBROADCAST, None))
+run_test(topo,0.1,number_of_nodes,100,1,1)
 
-    topo.start()
-    i = 0
-    #test for only 1 random node sending a message to another random node with sufficent waiting between messages, this basically tests failure rate
-    print("Reporting the overall statistics")
-    """
-    print("Testing channel failure rate by sending messages 1 by 1 with time inbetween")
-    while(i < 100):
-        random_node = random.randint(0,number_of_nodes-1)
-        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
-        time.sleep(0.1)
-        i = i + 1
-    time.sleep(1)
-    total_data_sent = 0
-    total_ack_sent = 0
-    total_data_received = 0
-    total_ack_received = 0
-    for node in range(number_of_nodes):
-        node = topo.nodes[node].appl
-        total_data_sent +=node.sent_data_counter
-        total_ack_sent +=node.sent_ack_counter
-        total_data_received += node.received_data_counter
-        total_ack_received +=node.received_ack_counter
-        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
-    data_fail_rate = 1-(total_data_received / total_data_sent)
-    ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
-    total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
-    print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
-    """
-    print("Testing channel failure rate with possible collisions by immediatly issueing many random sends")
-    total_data_sent = 0
-    total_ack_sent = 0
-    total_data_received = 0
-    total_ack_received = 0
-    while(i < 100):
-        random_node = random.randint(0,number_of_nodes-1)
-        topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
-        i = i + 1
-    time.sleep(100)
-    
-    for node in range(number_of_nodes):
-        node = topo.nodes[node].appl
-        total_data_sent +=node.sent_data_counter
-        total_ack_sent +=node.sent_ack_counter
-        total_data_received += node.received_data_counter
-        total_ack_received +=node.received_ack_counter
-        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
-    data_fail_rate = 1-(total_data_received / total_data_sent)
-    ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
-    total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
-    print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)    
 if __name__ == "__main__":
     main()
