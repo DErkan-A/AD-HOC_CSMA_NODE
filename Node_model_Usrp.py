@@ -120,7 +120,6 @@ class UsrpNode(GenericModel):
     
 def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time, counter_reset):
     print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
-    my_topology.start()
     i = 0
     #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
     print("Reporting the overall statistics")
@@ -159,8 +158,13 @@ def main():
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
-  
+    topo.start()
+
     run_test(topo,1,number_of_nodes,400,1,1)
+    run_test(topo,0.5,number_of_nodes,400,1,1)
+    run_test(topo,0.1,number_of_nodes,400,1,1)
+    run_test(topo,0.05,number_of_nodes,400,1,1)
+    run_test(topo,0.01,number_of_nodes,400,1,1)
 
 
 if __name__ == "__main__":
