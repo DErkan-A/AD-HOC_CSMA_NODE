@@ -77,7 +77,7 @@ class UsrpApplicationLayer(GenericModel):
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
-        print("size of payload is:"sys.getsizeof(payload))
+        print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
         print("size of event is:",sys.getsizeof(evt))
