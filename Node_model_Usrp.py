@@ -117,8 +117,9 @@ class UsrpNode(GenericModel):
         
         # self.phy.connect_me_to_component(ConnectorTypes.DOWN, self)
         # self.connect_me_to_component(ConnectorTypes.DOWN, self.appl)
-    
-def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time, counter_reset):
+
+#wait_time is waiting time between packet scheduling, number_of_messages is the total number of message that will be sent  
+def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time):
     print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
     i = 0
     #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
@@ -140,16 +141,12 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
         total_data_received += node.received_data_counter
         total_ack_received +=node.received_ack_counter
         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
-        if counter_reset:
-            node.sent_data_counter = 0
-            node.sent_ack_counter = 0
-            node.received_data_counter = 0
-            node.received_ack_counter = 0
 
     data_fail_rate = 1-(total_data_received / total_data_sent)
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
-    print("Data message failure rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)         
+    print("Data message failure rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
+    print("Average Throughput is: ", (total_fail_rate*70/wait_time)," bytes/sec")         
 
 def main():
     topo = Topology()
@@ -160,11 +157,7 @@ def main():
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.start()
 
-    run_test(topo,1,number_of_nodes,400,5,1)
-    run_test(topo,0.5,number_of_nodes,400,5,1)
-    run_test(topo,0.1,number_of_nodes,400,5,1)
-    run_test(topo,0.05,number_of_nodes,400,5,1)
-    run_test(topo,0.01,number_of_nodes,400,5,1)
+    run_test(topo,0.1,number_of_nodes,400,5)
 
 
 if __name__ == "__main__":
