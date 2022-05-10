@@ -159,11 +159,23 @@ def main():
     print("Data message success rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
 
     print("Testing channel failure rate with possible collisions by immediatly issueing many random sends")
+    total_data_sent = 0
+    total_ack_sent = 0
+    total_data_received = 0
+    total_ack_received = 0
     while(i < 100):
         random_node = random.randint(0,number_of_nodes-1)
         topo.nodes[random_node].appl.send_self(Event(topo.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         i = i + 1
     time.sleep(11)
+    
+    for node in range(number_of_nodes):
+        node = topo.nodes[node].appl
+        total_data_sent +=node.sent_data_counter
+        total_ack_sent +=node.sent_ack_counter
+        total_data_received += node.received_data_counter
+        total_ack_received +=node.received_ack_counter
+        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
     data_fail_rate = 1-(total_data_received / total_data_sent)
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
