@@ -56,7 +56,7 @@ class UsrpApplicationLayer(GenericModel):
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 self.received_data_counter += 1
                 #Print the received DATA message content
-                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
+                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
@@ -76,7 +76,7 @@ class UsrpApplicationLayer(GenericModel):
             destination_node = random.randint(0,3)
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
-        payload ="DATA: NODE-" + str(self.componentinstancenumber) +"  Message" + str(self.sent_data_counter)
+        payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
         print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
@@ -140,9 +140,9 @@ def main():
         time.sleep(0.1)
         i = i + 1
     time.sleep(1)
-    for node in topo.nodes:
-        print(node)
-         #print(f"Node.{node.appl.componentinstancenumber}, sent.{node.appl.sent_data_counter} Data, received.{node.appl.received_data_counter} Data, ACKed.{node.appl.sent_ack_counter}, received.{node.appl.received_ack_counter} ACKs")
+    for node in range(4):
+        node = topo.nodes[node].appl
+         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
 
 if __name__ == "__main__":
     main()
