@@ -160,11 +160,11 @@ def main():
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.start()
 
-    run_test(topo,1,number_of_nodes,400,1,1)
-    run_test(topo,0.5,number_of_nodes,400,1,1)
-    run_test(topo,0.1,number_of_nodes,400,1,1)
-    run_test(topo,0.05,number_of_nodes,400,1,1)
-    run_test(topo,0.01,number_of_nodes,400,1,1)
+    run_test(topo,1,number_of_nodes,400,5,1)
+    run_test(topo,0.5,number_of_nodes,400,5,1)
+    run_test(topo,0.1,number_of_nodes,400,5,1)
+    run_test(topo,0.05,number_of_nodes,400,5,1)
+    run_test(topo,0.01,number_of_nodes,400,5,1)
 
 
 if __name__ == "__main__":
