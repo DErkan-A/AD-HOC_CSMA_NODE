@@ -35,8 +35,10 @@ class UsrpApplicationLayerEventTypes(Enum):
 #Our aplication layer for nodes, basically all the logic happens here
 class UsrpApplicationLayer(GenericModel):
     def on_init(self, eventobj: Event):
-        self.counter = 0
-    
+        self.sent_data_counter = 0
+        self.received_data_counter = 0
+        self.sent_ack_counter = 0
+        self.received_ack_counter = 0
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
         #new event handler for packet generation, same otherwise
@@ -52,6 +54,7 @@ class UsrpApplicationLayer(GenericModel):
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
+                self.received_data_counter + = 1
                 #Print the received DATA message content
                 print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
@@ -59,8 +62,10 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload =eventobj.eventcontent.payload
                 self.send_down(evt)  # Send the ACK
+                self.sent_ack_counter += 1
             #Print the message content if you receive an ACK message    
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
+                self.received_ack_counter += 1
                 print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
     #handler function for message generation event
@@ -70,8 +75,8 @@ class UsrpApplicationLayer(GenericModel):
         while destination_node == self.componentinstancenumber:
             destination_node = random.randint(0,3)
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
-        self.counter = self.counter + 1       
-        payload ="DATA: BMSG-" + str(self.counter)
+        self.sent_data_counter += 1       
+        payload ="DATA: NODE-" + str(self.componentinstancenumber) +"  Message" + str(self.sent_data_counter)
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
         print(f"I am Node.{self.componentinstancenumber}, sending a message to.{hdr.messageto}")
@@ -135,6 +140,9 @@ def main():
         time.sleep(0.1)
         i = i + 1
     time.sleep(1)
+    for node in topo.nodes:
+         print(f"Node.{node.appl.componentinstancenumber}, sent.{node.appl.sent_data_counter} Data, received.{node.appl.received_data_counter} Data,
+          ACKed.{node.appl.sent_ack_counter}, received.{node.appl.received_ack_counter} ACKs")
 
 if __name__ == "__main__":
     main()
