@@ -10,6 +10,6 @@ My node model is very simple each node handles 2 message types namely ”DATA”
 
 This simple structure lets me do basic benchmarks about packet failure rate and average throughput.
 
-First of all changing node count or degree seemed unnecessary to me as maximum of 4 nodes can be used and 4 is a small number. Nodes are also mesh connected making diameter of the network constant at 1 regardless of the number of nodes. Hence, every experiment is with 4 nodes each having degree 4 and diameter of network as 1. size of my payload strings are about 70 bytes, I could not determine the size of the entire Event package.
+Nodes are also mesh connected making diameter of the network constant at 1 regardless of the number of nodes. I only tested with 4 nodes each having degree 4 and diameter of network as 1. size of my payload strings are about 70 bytes, I could not determine the size of the entire Event package.
 
-Average throughput is calculated with (packet_success_rate * 70byte / waiting_time_between_packets)
+Average throughput is calculated with (packet_success_rate * 70 / waiting_time_between_packets)
