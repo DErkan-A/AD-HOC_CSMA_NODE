@@ -147,7 +147,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
     example_payload="Message10 from NODE-1"
     payload_size = sys.getsizeof(example_payload)
-    print("Data message failure rate is:",data_fail_rate, " ACK message success rate is:",ack_fail_rate, " Total success rate is:",total_fail_rate)
+    print("Data message failure rate is:",data_fail_rate, " ACK message failure rate is:",ack_fail_rate, " Total failure rate is:",total_fail_rate)
     print("Average Throughput is: ", ((1-total_fail_rate)*payload_size/wait_time)," bytes/sec")         
 
 def main():
