@@ -9,7 +9,7 @@ from pickle import FALSE
 #from pickle import dumps as pickle_serialize
 from threading import Lock
 from adhoccomputing.Generics import Event, EventTypes
-from adhoccomputing.GenericMAC import GenericMac, GenericMacEventTypes
+from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCsmaPPersistentConfigurationParameters
 from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes, GenericMessageHeader,GenericMessage
 
 RTS_CTS_mutex = Lock()
@@ -21,20 +21,19 @@ class MACLayerMessageTypes(Enum):
     RTS = "RTS"
     CTS = "CTS"
 
-class MacCsmaRTS_CTS_PPersistentConfigurationParameters (ComponentConfigurationParameters):
+class MacCsmaRTS_CTS_PPersistentConfigurationParameters (MacCsmaPPersistentConfigurationParameters):
     def __init__(self, p, RTS_sleep_amount, CTS_sleep_amount):
-        self.p = p
+        super().__init__(p)
         self.CTS_sleep_amount = CTS_sleep_amount
         self.RTS_sleep_amount = RTS_sleep_amount
 
 
-class MacCsmaRTS_CTS_PPersistent(GenericMac):
+class MacCsmaRTS_CTS_PPersistent(MacCsmaPPersistent):
     #Constructor
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None, uhd=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology, uhd)
     #def __init__(self, componentname, componentinstancenumber, configurationparameters:MacCsmaPPersistentConfigurationParameters, uhd=uhd):
     #    super().__init__(componentname, componentinstancenumber, uhd)
-        self.p = configurationparameters.p
         self.RTS_sleep_amount = configurationparameters.RTS_sleep_amount
         self.CTS_sleep_amount = configurationparameters.CTS_sleep_amount
 
@@ -98,38 +97,7 @@ class MacCsmaRTS_CTS_PPersistent(GenericMac):
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):     
                 print("I am seeing a DATA signal RTS and CTS failed")
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
-                print("I am seeing ACK signal RTS and CTS failed")
-
-    def handle_frame(self):
-        #TODO: not a good solution put message in queue, schedule a future event to retry yhe first item in queueu    
-        #print("handle_frame")
-        if self.framequeue.qsize() > 0:           
-            #print("handle_frame", "queue not empty")                       
-            randval = random.random()
-            if randval < self.p: # TODO: Check if correct
-                clearmi, powerdb  = self.ahcuhd.ischannelclear(threshold=-35)
-                #print("Component:", self.componentinstancenumber, "clear mi=", clearmi, " Power=", powerdb)
-                if  clearmi == True:
-                    try:
-                        RTS_CTS_mutex.acquire()  
-                        eventobj = self.framequeue.get()
-                        evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-                        self.send_down(evt)
-                        self.back_off_constant = 1
-                        RTS_CTS_mutex.release()
-                    except Exception as e:
-                        print("MacCsmaPPersistent handle_frame exception, ", e)
-                else:
-                    if(self.back_off_constant<8):
-                        self.back_off_constant = self.back_off_constant + 1
-                        time.sleep(random.randrange(0,math.pow(2,self.back_off_constant))*0.001)
-                        self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None)) #Trigger handle_frame
-                    # if 7 retransmission are not enough drop the packet    
-                    else:
-                        self.back_off_constant = 1
-                        self.framequeue.get()
-                        print("Packet dropped")
-            else:                
-                time.sleep(0.00001) # TODO: Think about this otherwise we will only do cca
-                self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None))    
-             
+                print("I am seeing ACK signal RTS and CTS failed") 
+                
+    def on_message_from_top(self, eventobj: Event):
+        self.send_down(Event(self, EventTypes.MFRT, eventobj.eventcontent))         
