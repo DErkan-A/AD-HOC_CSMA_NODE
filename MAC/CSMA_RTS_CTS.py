@@ -178,7 +178,7 @@ class MacCsmaRTS_CTS(GenericMac):
                             try:
                                 #Peak at the foremost message and construct a RTS message
                                 eventobj = self.framequeue.queue[0]
-                                hdr = GenericMessageHeader(MACLayerMessageTypes.RTS,self.componentinstancenumber,eventobj.messageto)
+                                hdr = GenericMessageHeader(MACLayerMessageTypes.RTS,self.componentinstancenumber,eventobj.eventcontent.header.messageto)
                                 RTS_message = GenericMessage(hdr, None)
                                 RTS_evt = Event(self, EventTypes.MFRT, RTS_message)
                                 self.send_down(RTS_evt)
