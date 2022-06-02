@@ -28,7 +28,7 @@ class MAC_States(Enum):
 class ComponentConfigurationParameters():
     pass
 
-class MacCsmaRTS_CTS_PPersistentConfigurationParameters (ComponentConfigurationParameters):
+class MacCsmaRTS_CTS_ConfigurationParameters (ComponentConfigurationParameters):
     def __init__(self, slot_time = 0.001, NAV_RTS = 0.010, NAV_CTS = 0.080, NAV_DATA = 0.003, cca_threshold = -35):
         self.slot_time = slot_time
         self.NAV_RTS = NAV_RTS
@@ -37,7 +37,7 @@ class MacCsmaRTS_CTS_PPersistentConfigurationParameters (ComponentConfigurationP
         self.cca_threshold = cca_threshold
 
 
-class MacCsmaRTS_CTS_PPersistent(GenericMac):
+class MacCsmaRTS_CTS(GenericMac):
     #Constructor
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None, uhd=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology, uhd)
