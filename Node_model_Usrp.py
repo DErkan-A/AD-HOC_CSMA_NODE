@@ -7,7 +7,7 @@ import sys
 import time, random, math
 from enum import Enum
 from pickle import FALSE
-from .MAC.CSMA_RTS_CTS import MacCsmaRTS_CTS_ConfigurationParameters,MacCsmaRTS_CTS
+from MAC.CSMA_RTS_CTS import MacCsmaRTS_CTS_ConfigurationParameters,MacCsmaRTS_CTS
 
 
 from adhoccomputing.GenericModel import GenericModel
