@@ -7,7 +7,7 @@ import sys
 import time, random, math
 from enum import Enum
 from pickle import FALSE
-from .MAC import MacCsmaRTS_CTS_PPersistentConfigurationParameters,MacCsmaRTS_CTS_PPersistent
+from .MAC import MacCsmaRTS_CTS_ConfigurationParameters,MacCsmaRTS_CTS
 
 
 from adhoccomputing.GenericModel import GenericModel
@@ -93,11 +93,13 @@ class UsrpNode(GenericModel):
         # SUBCOMPONENTS
         
         #Configure the p-persisten MAC
-        macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
+        #macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
+        macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
         
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
         self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
-        self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        #self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
         
         self.components.append(self.appl)
         self.components.append(self.phy)
