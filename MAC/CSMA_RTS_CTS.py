@@ -42,7 +42,6 @@ class MacCsmaRTS_CTS(GenericMac):
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None, uhd=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology, uhd)
     #def __init__(self, componentname, componentinstancenumber, configurationparameters:MacCsmaPPersistentConfigurationParameters, uhd=uhd):
-        self.p = configurationparameters.p
         self.slot_time = configurationparameters.slot_time
         self.NAV_RTS = configurationparameters.NAV_RTS
         self.NAV_CTS = configurationparameters.NAV_CTS
