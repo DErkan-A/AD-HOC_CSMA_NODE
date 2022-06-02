@@ -8,7 +8,7 @@ import time, random, math
 from enum import Enum
 from pickle import FALSE
 from MAC.CSMA_RTS_CTS import MacCsmaRTS_CTS_ConfigurationParameters,MacCsmaRTS_CTS
-
+from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCsmaPPersistentConfigurationParameters
 
 from adhoccomputing.GenericModel import GenericModel
 from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes, GenericMessageHeader,GenericMessage
@@ -93,13 +93,13 @@ class UsrpNode(GenericModel):
         # SUBCOMPONENTS
         
         #Configure the p-persisten MAC
-        #macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
-        macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
+        macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
+        #macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
         
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
         self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
-        #self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
-        self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        #self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
         
         self.components.append(self.appl)
         self.components.append(self.phy)
