@@ -60,9 +60,9 @@ class MacCsmaRTS_CTS(GenericMac):
         self.retrial_counter = 0
         self.STATE = MAC_States.IDLE
         
-        self.RTS_timer = Timer(self.NAV_RTS,self.Timer_func())
-        self.CTS_timer = Timer(self.NAV_CTS,self.Timer_func())
-        self.DATA_timer = Timer(self.NAV_DATA,self.Timer_func())
+        self.RTS_timer = Timer(self.NAV_RTS,self.Timer_func)
+        self.CTS_timer = Timer(self.NAV_CTS,self.Timer_func)
+        self.DATA_timer = Timer(self.NAV_DATA,self.Timer_func)
         #Statistic variables
         self.sent_DATA_counter = 0
         self.received_DATA_counter = 0
