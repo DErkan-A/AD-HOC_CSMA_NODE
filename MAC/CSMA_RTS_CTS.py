@@ -86,10 +86,9 @@ class MacCsmaRTS_CTS(GenericMac):
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
         #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
-        
+        self.Cancel_Timer()      
         #If the message was targetting this node        
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
-            self.Cancel_Timer()
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
                 self.received_RTS_counter += 1
