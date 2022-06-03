@@ -61,7 +61,7 @@ class MacCsmaRTS_CTS(GenericMac):
         self.retrial_counter = 0
         self.STATE = MAC_States.IDLE
         
-        self.Timer = None
+        self.Timer = Timer(self.NAV_CTS,self.Timer_func)
         #Statistic variables
         self.sent_DATA_counter = 0
         self.received_DATA_counter = 0
