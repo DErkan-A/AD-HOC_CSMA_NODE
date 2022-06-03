@@ -91,7 +91,7 @@ class MacCsmaRTS_CTS(GenericMac):
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
-                print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}")
+                print(f"Node{self.componentinstancenumber}, Sending CTS to Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_RTS_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
@@ -104,7 +104,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.send_down(evt)  # Send the CTS
                 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
-                print(f"Node{self.componentinstancenumber}, Received CTS from Node{eventobj.eventcontent.header.messagefrom}")
+                print(f"Node{self.componentinstancenumber}, Sending DATA to Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_CTS_counter += 1
                 #Immediatly send the DATA message back
                 payload = self.framequeue.queue[0]
@@ -116,7 +116,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.send_down(DATA_evt)
 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
-                print(f"Node{self.componentinstancenumber}, Received DATA from Node{eventobj.eventcontent.header.messagefrom}")
+                print(f"Node{self.componentinstancenumber}, Sending ACK to Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_DATA_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
