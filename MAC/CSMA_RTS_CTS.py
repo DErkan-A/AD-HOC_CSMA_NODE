@@ -91,6 +91,7 @@ class MacCsmaRTS_CTS(GenericMac):
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
+                print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_RTS_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
@@ -103,6 +104,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.send_down(evt)  # Send the CTS
                 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
+                print(f"Node{self.componentinstancenumber}, Received CTS from Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_CTS_counter += 1
                 #Immediatly send the DATA message back
                 payload = self.framequeue.queue[0]
@@ -114,6 +116,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.send_down(DATA_evt)
 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
+                print(f"Node{self.componentinstancenumber}, Received DATA from Node{eventobj.eventcontent.header.messagefrom}")
                 self.received_DATA_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
@@ -124,7 +127,8 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.sent_ack_counter += 1
                 self.send_up(eventobj.eventcontent.payload)   
 
-            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):                
+            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
+                print(f"Node{self.componentinstancenumber}, Received ACK from Node{eventobj.eventcontent.header.messagefrom}")               
                 self.received_ACK_counter += 1
                 #self.STATE.ACK_received
                 #Even if we are the one to receive the ACK we move on to the contention rather than idle
@@ -160,6 +164,7 @@ class MacCsmaRTS_CTS(GenericMac):
             if self.STATE==MAC_States.IDLE:
                 #If we exceed the maximum retry count for a packet drop it and send the packet with -1 message_from to the top
                 if self.retrial_counter > self.retry_max:
+                    print(f"Node{self.componentinstancenumber}, Droping a packet destined for Node{eventobj.eventcontent.header.messagefrom} since max retry is reached ")
                     self.retrial_counter=0
                     eventobj=self.framequeue.get()
                     evt = Event(self, EventTypes.MFRB, eventobj.eventcontent)
@@ -181,6 +186,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                 RTS_message = GenericMessage(hdr, None)
                                 RTS_evt = Event(self, EventTypes.MFRT, RTS_message)
                                 self.send_down(RTS_evt)
+                                print(f"Node{self.componentinstancenumber}, Sending RTS to Node{eventobj.eventcontent.header.messagefrom}")
                                 self.retrial_counter+=1
                                 self.back_off_counter = self.retrial_counter
                                 self.STATE = MAC_States.CTS_pending
