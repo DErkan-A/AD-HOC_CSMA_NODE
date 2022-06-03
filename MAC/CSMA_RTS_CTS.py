@@ -141,15 +141,19 @@ class MacCsmaRTS_CTS(GenericMac):
         #if the message was for another node
         else:
             if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
+                print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
                 self.STATE=MAC_States.Blocked
                 self.RTS_timer.start()
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
+                print(f"Node{self.componentinstancenumber}, Received CTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
                 self.STATE=MAC_States.Blocked
                 self.CTS_timer.start()
-            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):     
+            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
+                print(f"Node{self.componentinstancenumber}, Received DATA from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")     
                 self.STATE=MAC_States.Blocked
                 self.DATA_timer.start()
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
+                print(f"Node{self.componentinstancenumber}, Received ACK from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
                 pass
 
     def handle_frame(self):
