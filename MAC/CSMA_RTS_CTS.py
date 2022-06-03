@@ -164,7 +164,7 @@ class MacCsmaRTS_CTS(GenericMac):
             if self.STATE==MAC_States.IDLE:
                 #If we exceed the maximum retry count for a packet drop it and send the packet with -1 message_from to the top
                 if self.retrial_counter > self.retry_max:
-                    print(f"Node{self.componentinstancenumber}, Droping a packet destined for Node{eventobj.eventcontent.header.messagefrom} since max retry is reached ")
+                    print(f"Node{self.componentinstancenumber}, Droping a packet destined for Node{eventobj.eventcontent.header.messageto} since max retry is reached ")
                     self.retrial_counter=0
                     eventobj=self.framequeue.get()
                     evt = Event(self, EventTypes.MFRB, eventobj.eventcontent)
@@ -186,7 +186,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                 RTS_message = GenericMessage(hdr, None)
                                 RTS_evt = Event(self, EventTypes.MFRT, RTS_message)
                                 self.send_down(RTS_evt)
-                                print(f"Node{self.componentinstancenumber}, Sending RTS to Node{eventobj.eventcontent.header.messagefrom}")
+                                print(f"Node{self.componentinstancenumber}, Sending RTS to Node{eventobj.eventcontent.header.messageto}")
                                 self.retrial_counter+=1
                                 self.back_off_counter = self.retrial_counter
                                 self.STATE = MAC_States.CTS_pending
