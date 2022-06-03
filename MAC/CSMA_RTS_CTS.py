@@ -1,5 +1,6 @@
 #Disclaimer!!!
 # CSMA with RTS/CTS written by Doğu Erkan Arkadaş, CSMA part is taken from the ad hoc library
+# Apperantly the same timer cannot be called more than once so we need to create a new timer everytime we need one
 
 import time, random, math
 from enum import Enum
