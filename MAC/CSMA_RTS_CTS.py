@@ -196,6 +196,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                 self.STATE = MAC_States.CTS_pending
                                 self.DATA_timer.start()
                             except Exception as e:
+                                print(f"Node{self.componentinstancenumber}")
                                 print("MacCsma handle_frame exception, ", e)
                         else:
                             if(self.back_off_counter<8):
