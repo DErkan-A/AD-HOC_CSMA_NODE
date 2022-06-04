@@ -176,12 +176,12 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.send_up(evt)
                 else:    
                     #print("handle_frame", "queue not empty")
-                    clearmi, powerdb  = self.ahcuhd.ischannelclear(threshold=self.cca_threshold)
+                    clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                     #print("Component:", self.componentinstancenumber, "clear mi=", clearmi, " Power=", powerdb)
                     if  clearmi == True:
                         #Wait DIFS then sense again
                         time.sleep(self.slot_time)
-                        clearmi, powerdb  = self.ahcuhd.ischannelclear(threshold=self.cca_threshold)
+                        clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                         if  clearmi == True:
                             try:
                                 #Peak at the foremost message and construct a RTS message
