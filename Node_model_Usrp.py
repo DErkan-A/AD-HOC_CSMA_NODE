@@ -93,13 +93,13 @@ class UsrpNode(GenericModel):
         # SUBCOMPONENTS
         
         #Configure the p-persisten MAC
-        #macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
-        macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
+        macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
+        #macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
         
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
         self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
-        #self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
-        self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        #self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
         
         self.components.append(self.appl)
         self.components.append(self.phy)
@@ -147,9 +147,11 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
     data_fail_rate = 1-(total_data_received / total_data_sent)
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
+    total_successfull_transmissions = total_ack_received/total_data_sent
     example_payload="Message10 from NODE-1"
     payload_size = sys.getsizeof(example_payload)
     print("Data message failure rate is:",data_fail_rate, " ACK message failure rate is:",ack_fail_rate, " Total failure rate is:",total_fail_rate)
+    print("Succesfull Transmission rate is:",total_successfull_transmissions)
     print("Average Throughput is: ", ((1-total_fail_rate)*payload_size/wait_time)," bytes/sec")         
 
 def main():
