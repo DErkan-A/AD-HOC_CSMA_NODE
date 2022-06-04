@@ -156,7 +156,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
 
 def main():
     topo = Topology()
-    number_of_nodes = 4
+    number_of_nodes = 2
 # Note that the topology has to specific: usrp winslab_b210_0 is run by instance 0 of the component
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
