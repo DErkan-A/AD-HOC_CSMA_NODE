@@ -15,6 +15,7 @@ from adhoccomputing.Generics import Event, EventTypes, ConnectorTypes, GenericMe
 from adhoccomputing.Experimentation.Topology import Topology
 from adhoccomputing.Networking.PhysicalLayer.UsrpB210OfdmFlexFramePhy import  UsrpB210OfdmFlexFramePhy
 from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCsmaPPersistentConfigurationParameters
+from adhoccomputing.Networking.LogicalChannels.GenericChannel import FIFOBroadcastPerfectChannel
 
 #registry = ComponentRegistry()
 #from ahc.Channels.Channels import FIFOBroadcastPerfectChannel
