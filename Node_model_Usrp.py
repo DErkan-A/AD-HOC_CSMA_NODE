@@ -22,6 +22,7 @@ from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCs
 
 #framers = FramerObjects()
 
+number_of_nodes = 2
 
 # Message types that will be carried in eventcontent header
 class ApplicationLayerMessageTypes(Enum):
@@ -71,9 +72,9 @@ class UsrpApplicationLayer(GenericModel):
     #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
         #select a random destination node that is not yourself
-        destination_node = random.randint(0,3)
+        destination_node = random.randint(0,number_of_nodes-1)
         while destination_node == self.componentinstancenumber:
-            destination_node = random.randint(0,3)
+            destination_node = random.randint(0,number_of_nodes-1)
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
@@ -156,7 +157,6 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
 
 def main():
     topo = Topology()
-    number_of_nodes = 2
 # Note that the topology has to specific: usrp winslab_b210_0 is run by instance 0 of the component
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
