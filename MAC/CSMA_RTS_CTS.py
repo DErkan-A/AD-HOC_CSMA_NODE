@@ -30,7 +30,7 @@ class ComponentConfigurationParameters():
     pass
 
 class MacCsmaRTS_CTS_ConfigurationParameters (ComponentConfigurationParameters):
-    def __init__(self, slot_time = 0.01, NAV_RTS = 0.5, NAV_CTS = 0.4, NAV_DATA = 0.2, cca_threshold = -35):
+    def __init__(self, slot_time = 0.05, NAV_RTS = 0.5, NAV_CTS = 0.4, NAV_DATA = 0.2, cca_threshold = -35):
         self.slot_time = slot_time
         self.NAV_RTS = NAV_RTS
         self.NAV_CTS = NAV_CTS
