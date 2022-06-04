@@ -94,13 +94,13 @@ class UsrpNode(GenericModel):
         # SUBCOMPONENTS
         
         #Configure the p-persisten MAC
-        macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
-        #macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
+        #macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
+        macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
         
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
         self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
-        self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
-        #self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        #self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
+        self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, uhd=self.phy.ahcuhd,topology=topology)
         
         self.components.append(self.appl)
         self.components.append(self.phy)
@@ -162,7 +162,7 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.start()
-    run_test(topo,0.1,number_of_nodes,200,5)
+    run_test(topo,0.1,number_of_nodes,10,5)
 
 
 if __name__ == "__main__":
