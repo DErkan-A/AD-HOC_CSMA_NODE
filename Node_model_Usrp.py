@@ -160,7 +160,7 @@ def main():
     topo = Topology()
 # Note that the topology has to specific: usrp winslab_b210_0 is run by instance 0 of the component
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
-    topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode,FIFOBroadcastPerfectChannel)
+    topo.construct_winslab_topology_with_channels(number_of_nodes, UsrpNode,FIFOBroadcastPerfectChannel)
   # topo.construct_winslab_topology_with_channels(2, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.start()
     run_test(topo,0.1,number_of_nodes,10,5)
