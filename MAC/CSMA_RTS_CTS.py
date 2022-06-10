@@ -120,7 +120,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 ACK_message = GenericMessage(hdr, None)
                 ACK_evt = Event(self, EventTypes.MFRT, ACK_message)
                 self.send_down(ACK_evt)          
-                self.sent_ack_counter += 1
+                self.sent_ACK_counter += 1
                 self.send_up(eventobj.eventcontent.payload)   
 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
