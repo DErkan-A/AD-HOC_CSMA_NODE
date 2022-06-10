@@ -167,8 +167,6 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
     run_test(topo,0.1,number_of_nodes,100,5)
-    topo.exit()
-
 
 if __name__ == "__main__":
     main()
