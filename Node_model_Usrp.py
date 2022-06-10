@@ -58,7 +58,7 @@ class UsrpApplicationLayer(GenericModel):
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 self.received_data_counter += 1
                 #Print the received DATA message content
-                #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
+                print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
@@ -68,7 +68,7 @@ class UsrpApplicationLayer(GenericModel):
             #Print the message content if you receive an ACK message and increase the counter   
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 self.received_ack_counter += 1
-                #print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
+                print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
 
     #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
@@ -82,7 +82,7 @@ class UsrpApplicationLayer(GenericModel):
         #print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
-        #print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
+        print(f"I am Node.{self.componentinstancenumber}, sending a message to Node.{hdr.messageto}")
         self.send_down(evt)
     
          
