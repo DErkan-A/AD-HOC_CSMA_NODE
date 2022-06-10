@@ -160,7 +160,6 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
     print("Average Throughput is: ", ((1-total_fail_rate)*payload_size/wait_time)," bytes/sec")         
 
 def main():
-    setAHCLogLevel(LOG_LEVEL_APPLOG)
     topo = Topology()
 # Note that the topology has to specific: usrp winslab_b210_0 is run by instance 0 of the component
 # Therefore, the usrps have to have names winslab_b210_x where x \in (0 to nodecount-1)
