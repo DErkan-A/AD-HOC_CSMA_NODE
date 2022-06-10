@@ -23,7 +23,7 @@ from adhoccomputing.Networking.LogicalChannels.GenericChannel import FIFOBroadca
 
 #framers = FramerObjects()
 
-number_of_nodes = 4
+number_of_nodes = 2
 
 # Message types that will be carried in eventcontent header
 class ApplicationLayerMessageTypes(Enum):
