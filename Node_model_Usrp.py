@@ -69,6 +69,8 @@ class UsrpApplicationLayer(GenericModel):
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 self.received_ack_counter += 1
                 print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
+            else:
+                print(f"Unidentified message type")  
 
     #handler function for message generation event
     def on_startbroadcast(self, eventobj: Event):
