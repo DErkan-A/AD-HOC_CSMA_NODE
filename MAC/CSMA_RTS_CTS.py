@@ -72,12 +72,17 @@ class MacCsmaRTS_CTS(GenericMac):
         self.sent_RTS_counter = 0
         self.received_RTS_counter = 0
         self.received_CTS_counter = 0
+        self.handle_frame()
         super().on_init(eventobj)  # required because of inheritence
         #print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
     def Timer_func(self):
         self.STATE = MAC_States.Contention
-        
+
+    def on_message_from_top(self, eventobj: Event):
+        # put message in queue and try accessing the channel
+        self.framequeue.put_nowait(eventobj)       
+
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
         #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
