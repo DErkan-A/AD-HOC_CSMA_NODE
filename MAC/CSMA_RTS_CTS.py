@@ -117,6 +117,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.received_DATA_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
+                self.STATE==MAC_States.Contention
                 hdr = GenericMessageHeader(MACLayerMessageTypes.ACK,self.componentinstancenumber,eventobj.eventcontent.header.messagefrom)
                 ACK_message = GenericMessage(hdr, None)
                 ACK_evt = Event(self, EventTypes.MFRT, ACK_message)
