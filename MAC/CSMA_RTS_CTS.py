@@ -138,24 +138,25 @@ class MacCsmaRTS_CTS(GenericMac):
 
         #if the message was for another node
         else:
-            if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
-                print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
-                self.STATE=MAC_States.Blocked
-                self.Timer =Timer(self.NAV_RTS,self.Timer_func)
-                self.Timer.start()
-            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
-                print(f"Node{self.componentinstancenumber}, Received CTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
-                self.STATE=MAC_States.Blocked
-                self.Timer =Timer(self.NAV_CTS,self.Timer_func)
-                self.Timer.start()
-            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
-                print(f"Node{self.componentinstancenumber}, Received DATA from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")     
-                self.STATE=MAC_States.Blocked
-                self.Timer =Timer(self.NAV_DATA,self.Timer_func)
-                self.Timer.start()
-            elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
-                print(f"Node{self.componentinstancenumber}, Received ACK from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
-                pass
+            if(self.STATE == MAC_States.IDLE):
+                if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
+                    print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
+                    self.STATE=MAC_States.Blocked
+                    self.Timer =Timer(self.NAV_RTS,self.Timer_func)
+                    self.Timer.start()
+                elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
+                    print(f"Node{self.componentinstancenumber}, Received CTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
+                    self.STATE=MAC_States.Blocked
+                    self.Timer =Timer(self.NAV_CTS,self.Timer_func)
+                    self.Timer.start()
+                elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
+                    print(f"Node{self.componentinstancenumber}, Received DATA from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")     
+                    self.STATE=MAC_States.Blocked
+                    self.Timer =Timer(self.NAV_DATA,self.Timer_func)
+                    self.Timer.start()
+                elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
+                    print(f"Node{self.componentinstancenumber}, Received ACK from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
+                    pass
 
     def handle_frame(self):
         #TODO: not a good solution put message in queue, schedule a future event to retry yhe first item in queueu    
