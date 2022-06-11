@@ -58,6 +58,7 @@ class MacCsmaRTS_CTS(GenericMac):
     def on_init(self, eventobj: Event):
         #initial back_off is 0
         self.back_off_counter =self.initial_backoff
+        self.back_off_max = 4
         self.retrial_counter = 0
         self.STATE = MAC_States.IDLE
         
@@ -199,11 +200,11 @@ class MacCsmaRTS_CTS(GenericMac):
                             except Exception as e:
                                 print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
                         else:
-                            if(self.back_off_counter<8):
+                            if(self.back_off_counter<self.back_off_max):
                                 self.retback_off_counterrialcnt = self.back_off_counter + 1
                             time.sleep(random.randrange(0,math.pow(2,self.back_off_counter))*self.slot_time)
                     else:
-                        if(self.back_off_counter<8):
+                        if(self.back_off_counter<self.back_off_max):
                             self.retback_off_counterrialcnt = self.back_off_counter + 1
                         time.sleep(random.randrange(0,math.pow(2,self.back_off_counter))*self.slot_time)
                         #print("Busy")
