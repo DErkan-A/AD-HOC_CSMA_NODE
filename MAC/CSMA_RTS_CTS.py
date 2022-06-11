@@ -163,6 +163,7 @@ class MacCsmaRTS_CTS(GenericMac):
         #print("handle_frame")
             #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         if self.STATE==MAC_States.Contention:
+            print(f"Node{self.componentinstancenumber}, in contention")
             time.sleep(random.randrange(0,math.pow(2,self.contention_backoff))*self.slot_time)
             self.STATE=MAC_States.IDLE
             
