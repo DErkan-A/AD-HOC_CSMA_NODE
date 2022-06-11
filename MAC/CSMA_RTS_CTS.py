@@ -166,7 +166,7 @@ class MacCsmaRTS_CTS(GenericMac):
             time.sleep(random.randrange(0,math.pow(2,self.contention_backoff))*self.slot_time)
             self.STATE=MAC_States.IDLE
             
-        if self.framequeue.qsize() > 0:
+        elif self.framequeue.qsize() > 0:
             if self.STATE==MAC_States.IDLE:
                 #If we exceed the maximum retry count for a packet drop it and send the packet with -1 message_from to the top
                 if self.retrial_counter > self.retry_max:                   
