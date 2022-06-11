@@ -30,7 +30,7 @@ class ComponentConfigurationParameters():
     pass
 
 class MacCsmaRTS_CTS_ConfigurationParameters (ComponentConfigurationParameters):
-    def __init__(self, slot_time = 0.2, NAV_RTS = 0.6, NAV_CTS = 0.4, NAV_DATA = 0.2, cca_threshold = -35):
+    def __init__(self, slot_time = 0.1, NAV_RTS = 0.3, NAV_CTS = 0.2, NAV_DATA = 0.1, cca_threshold = -35):
         self.slot_time = slot_time
         self.NAV_RTS = NAV_RTS
         self.NAV_CTS = NAV_CTS
@@ -117,12 +117,13 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.received_DATA_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
-                self.STATE==MAC_States.Contention
                 hdr = GenericMessageHeader(MACLayerMessageTypes.ACK,self.componentinstancenumber,eventobj.eventcontent.header.messagefrom)
                 ACK_message = GenericMessage(hdr, None)
                 ACK_evt = Event(self, EventTypes.MFRT, ACK_message)
                 self.send_down(ACK_evt)          
                 self.sent_ACK_counter += 1
+                self.Timer =Timer(self.NAV_DATA,self.Timer_func)
+                self.Timer.start()
                 self.send_up(eventobj.eventcontent.payload)   
 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
