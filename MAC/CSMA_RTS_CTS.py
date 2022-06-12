@@ -146,7 +146,7 @@ class MacCsmaRTS_CTS(GenericMac):
 
         #if the message was for another node
         else:
-            if(self.STATE == MAC_States.IDLE):
+            if(self.STATE == MAC_States.IDLE or self.STATE == MAC_States.Contention):
                 self.Timer.cancel()
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
                     print(f"Node{self.componentinstancenumber}, Received RTS from Node{eventobj.eventcontent.header.messagefrom}, to Node{eventobj.eventcontent.header.messageto}")
