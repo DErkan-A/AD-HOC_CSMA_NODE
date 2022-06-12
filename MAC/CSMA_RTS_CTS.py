@@ -142,6 +142,8 @@ class MacCsmaRTS_CTS(GenericMac):
                 #Deque the packet
                 if self.framequeue.qsize() > 0:
                     eventobj=self.framequeue.get()
+                    
+
 
 
         #if the message was for another node
