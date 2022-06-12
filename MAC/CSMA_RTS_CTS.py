@@ -233,5 +233,5 @@ class MacCsmaRTS_CTS(GenericMac):
         else:
             #print("Queue size", self.framequeue.qsize())            
             pass
-        time.sleep(self.slot_time) # TODO: Think about this otherwise we will only do cca
+        time.sleep(self.slot_time/10) # TODO: Think about this otherwise we will only do cca
         self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None)) #Continuously trigger handle_frame
