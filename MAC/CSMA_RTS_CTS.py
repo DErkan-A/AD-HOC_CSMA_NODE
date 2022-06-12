@@ -140,7 +140,8 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.back_off_counter = self.initial_backoff
                 self.retrial_counter=0
                 #Deque the packet
-                eventobj=self.framequeue.get()
+                if self.framequeue.qsize() > 0:
+                    eventobj=self.framequeue.get()
 
 
         #if the message was for another node
