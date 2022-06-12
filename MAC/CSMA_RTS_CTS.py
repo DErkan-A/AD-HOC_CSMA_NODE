@@ -129,7 +129,8 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.sent_ACK_counter += 1
                 self.Timer =Timer(self.NAV_DATA,self.Timer_func)
                 self.Timer.start()
-                self.send_up(eventobj.eventcontent.payload)   
+                evt = Event(self, EventTypes.MFRB, eventobj.eventcontent.payload.eventcontent)
+                self.send_up(evt)
 
             elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
                 print(f"Node{self.componentinstancenumber}, Received ACK from Node{eventobj.eventcontent.header.messagefrom}")               
