@@ -72,7 +72,8 @@ class MacCsmaRTS_CTS(GenericMac):
         self.sent_RTS_counter = 0
         self.received_RTS_counter = 0
         self.received_CTS_counter = 0
-        self.handle_frame()
+        #start handle frame
+        self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None))
         super().on_init(eventobj)  # required because of inheritence
         #print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
@@ -143,7 +144,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 #Deque the packet
                 if self.framequeue.qsize() > 0:
                     eventobj=self.framequeue.get()
-                self.handle_frame()    
+                #self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None))   
                     
 
 
