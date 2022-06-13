@@ -90,7 +90,7 @@ class UsrpApplicationLayer(GenericModel):
          
 class UsrpNode(GenericModel):
     def on_init(self, eventobj: Event):
-        pass
+        super().on_init(eventobj)
     
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
