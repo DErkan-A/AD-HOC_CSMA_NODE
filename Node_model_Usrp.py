@@ -98,7 +98,7 @@ class UsrpNode(GenericModel):
         
         #Configure the p-persisten MAC
         #macconfig = MacCsmaPPersistentConfigurationParameters(0.5)
-        macconfig = MacCsmaRTS_CTS_ConfigurationParameters()
+        macconfig = MacCsmaRTS_CTS_ConfigurationParameters(cca_threshold=-51)
         sdrconfig = SDRConfiguration(freq =2484000000.0, bandwidth = 20000000, chan = 0, hw_tx_gain = 76, hw_rx_gain = 20, sw_tx_gain = -12.0)
 
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
