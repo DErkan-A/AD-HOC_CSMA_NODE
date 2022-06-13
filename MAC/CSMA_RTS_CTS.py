@@ -90,7 +90,10 @@ class MacCsmaRTS_CTS(GenericMac):
         self.framequeue.put_nowait(eventobj)      
 
     def on_message_from_bottom(self, eventobj: Event):
-        self.received_framequeue.put_nowait(eventobj)
+        if eventobj.eventcontent.header.messagefrom==self.componentinstancenumber:
+            pass
+        else:    
+            self.received_framequeue.put_nowait(eventobj)
 
     def handle_frame(self):
         #TODO: not a good solution put message in queue, schedule a future event to retry yhe first item in queueu    
@@ -100,9 +103,7 @@ class MacCsmaRTS_CTS(GenericMac):
             while self.received_framequeue.qsize()>0:
                 eventobj = self.received_framequeue.get()
             evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-            if self.componentinstancenumber == eventobj.eventcontent.header.messagefrom:
-                pass # We do not want loopback
-            elif self.componentinstancenumber == eventobj.eventcontent.header.messageto:
+            if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
                 self.Timer.cancel()
                 #Generate and send the ACK message (paylod is the same as original message) to the sender
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
