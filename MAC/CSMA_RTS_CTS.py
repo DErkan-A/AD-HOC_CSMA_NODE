@@ -178,6 +178,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         elif self.STATE==MAC_States.Contention:
+                print(f"Node{self.componentinstancenumber}: in contention")
                 self.STATE=MAC_States.Blocked
                 contention_selected=random.randrange(math.pow(2,self.contention_backoff))
                 self.Timer.cancel()
