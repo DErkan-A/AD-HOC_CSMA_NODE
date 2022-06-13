@@ -56,7 +56,7 @@ class MacCsmaRTS_CTS(GenericMac):
         
         self.contention_backoff = 3
         self.initial_backoff = 2
-        self.retry_max=6
+        self.retry_max=4
 
     
     #on_init will be called from topo.start to initialize components
@@ -77,7 +77,7 @@ class MacCsmaRTS_CTS(GenericMac):
         self.sent_RTS_counter = 0
         self.received_RTS_counter = 0
         self.received_CTS_counter = 0
-        self.handle_frame()
+        self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None))
         super().on_init(eventobj)  # required because of inheritence
         #print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
