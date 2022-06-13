@@ -137,17 +137,25 @@ class UsrpNode(GenericModel):
         # self.connect_me_to_component(ConnectorTypes.DOWN, self.appl)
 
 #wait_time is waiting time between packet scheduling, number_of_messages is the total number of message that will be sent  
-def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish_wait_time):
+def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
     print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
     i = 0
     #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
     print("Reporting the overall statistics")
+    start_time=time.time()
     while(i < number_of_messages):
         random_node = random.randint(0,number_of_nodes-1)
         my_topology.nodes[random_node].appl.send_self(Event(my_topology.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(wait_time)
         i = i + 1
-    time.sleep(finish_wait_time)
+    running_flag=True
+    while running_flag:
+        time.sleep(1)
+        running_flag=False
+        for i in range(number_of_nodes):
+            if my_topology.nodes[i].mac.framequeue.qsize()>0:
+                running_flag=True
+    run_time=time.time()-start_time
     total_data_sent = 0
     total_ack_sent = 0
     total_data_received = 0
@@ -164,11 +172,14 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages, finish
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
     total_fail_rate = 1-((total_data_received +  total_ack_received)/ (total_data_sent+total_ack_sent))
     total_successfull_transmissions = total_ack_received/total_data_sent
-    example_payload="Message10 from NODE-1"
-    payload_size = sys.getsizeof(example_payload)
+    example_Data_payload="Message10 from NODE-1" + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING" + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
+    example_ACK_payload = "ACK_MSG"
+    print("Run time is: ",run_time)
     print("Data message failure rate is:",data_fail_rate, " ACK message failure rate is:",ack_fail_rate, " Total failure rate is:",total_fail_rate)
-    print("Succesfull Transmission rate is:",total_successfull_transmissions)
-    print("Average Throughput is: ", ((1-total_fail_rate)*payload_size/wait_time)," bytes/sec")         
+    print("Succesfull Transmission rate (DATA and ACK successfull) is:",total_successfull_transmissions)
+    total_transfered_data = sys.getsizeof(example_Data_payload) * number_of_messages * (1-data_fail_rate)
+    total_transfered_data += sys.getsizeof(example_ACK_payload) * number_of_messages * (1-ack_fail_rate)
+    print("Average Throughput is: ", total_transfered_data/run_time," bytes/sec")         
 
 def main():
     topo = Topology()
@@ -177,7 +188,7 @@ def main():
     #topo.construct_winslab_topology_with_channels(number_of_nodes, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
-    run_test(topo,0.01,number_of_nodes,50,60)
+    run_test(topo,0.01,number_of_nodes,50)
 
 if __name__ == "__main__":
     main()
