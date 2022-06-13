@@ -180,8 +180,8 @@ class MacCsmaRTS_CTS(GenericMac):
         elif self.STATE==MAC_States.Contention:
                 print(f"Node{self.componentinstancenumber}: in contention")
                 self.STATE=MAC_States.Blocked
-                contention_selected=random.randrange(math.pow(2,self.contention_backoff))
                 self.Timer.cancel()
+                contention_selected=random.randrange(math.pow(2,self.contention_backoff))              
                 self.Timer =Timer(contention_selected*self.slot_time,self.Timer_func_contention)               
                 self.Timer.start()
         elif self.framequeue.qsize() > 0:
