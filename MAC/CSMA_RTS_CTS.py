@@ -220,7 +220,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                     self.retrial_counter+=1
                                     self.back_off_counter = self.retrial_counter
                                     self.STATE = MAC_States.CTS_pending
-                                    self.Timer =Timer(self.NAV_RTS,self.Timer_func)
+                                    self.Timer =Timer(self.NAV_RTS +self.slot_time,self.Timer_func)
                                     self.Timer.start()
                                     self.send_down(RTS_evt)
                                 else:
