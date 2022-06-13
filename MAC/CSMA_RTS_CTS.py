@@ -56,7 +56,7 @@ class MacCsmaRTS_CTS(GenericMac):
         
         self.contention_backoff = 3
         self.initial_backoff = 2
-        self.retry_max=4
+        self.retry_max=6
         #initial back_off is 0
         self.back_off_counter =self.initial_backoff
         self.back_off_max = 4
