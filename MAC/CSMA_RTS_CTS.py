@@ -184,7 +184,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.contention_selected=random.randint(0,math.pow(2,self.contention_backoff))
             if(self.contention_counter<self.contention_selected):
                 self.contention_counter+=1
-                time.sleep(self.slot_time/5)
+                time.sleep(self.slot_time/2)
             else:
                 self.STATE=MAC_States.IDLE
 
