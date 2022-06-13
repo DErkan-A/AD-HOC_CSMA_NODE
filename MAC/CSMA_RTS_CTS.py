@@ -78,7 +78,7 @@ class MacCsmaRTS_CTS(GenericMac):
     def on_init(self, eventobj: Event):     
         self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None))
         super().on_init(eventobj)  # required because of inheritence
-        #print("Initialized", self.componentname, ":", self.componentinstancenumber)
+        ##print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
     def Timer_func(self):
         self.STATE = MAC_States.Contention
@@ -97,7 +97,7 @@ class MacCsmaRTS_CTS(GenericMac):
 
     def handle_frame(self):
         #TODO: not a good solution put message in queue, schedule a future event to retry yhe first item in queueu    
-        #print("handle_frame")
+        ##print("handle_frame")
         #If we received frames from other nodes we must first check them
         if self.received_framequeue.qsize()>0:
             while self.received_framequeue.qsize()>0:
@@ -107,7 +107,7 @@ class MacCsmaRTS_CTS(GenericMac):
             if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
                 #Send different messages depending on which message came
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
-                    print(f"Node{self.componentinstancenumber}: Sending CTS to {eventobj.eventcontent.header.messagefrom} ")
+                    #print(f"Node{self.componentinstancenumber}: Sending CTS to {eventobj.eventcontent.header.messagefrom} ")
                     self.received_RTS_counter += 1
                     evt.eventcontent.header.messagetype = MACLayerMessageTypes.CTS   
                     evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
@@ -119,7 +119,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.send_down(evt)  # Send the CTS
                 
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
-                    print(f"Node{self.componentinstancenumber}: Sending DATA to {eventobj.eventcontent.header.messagefrom} ")
+                    #print(f"Node{self.componentinstancenumber}: Sending DATA to {eventobj.eventcontent.header.messagefrom} ")
                     self.received_CTS_counter += 1
                     #Immediatly send the DATA message back
                     payload = self.framequeue.queue[0]
@@ -132,7 +132,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.send_down(DATA_evt)
 
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
-                    print(f"Node{self.componentinstancenumber}: Sending ACK to {eventobj.eventcontent.header.messagefrom} ")
+                    #print(f"Node{self.componentinstancenumber}: Sending ACK to {eventobj.eventcontent.header.messagefrom} ")
                     self.received_DATA_counter += 1
                     hdr = GenericMessageHeader(MACLayerMessageTypes.ACK,self.componentinstancenumber,eventobj.eventcontent.header.messagefrom)
                     ACK_message = GenericMessage(hdr, None)
@@ -146,7 +146,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.send_up(evt)   
 
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
-                    print(f"Node{self.componentinstancenumber}: Received ACK from {eventobj.eventcontent.header.messagefrom} ")               
+                    #print(f"Node{self.componentinstancenumber}: Received ACK from {eventobj.eventcontent.header.messagefrom} ")               
                     self.received_ACK_counter += 1
                     #Even if we are the one to receive the ACK we move on to the contention rather than idle
                     self.STATE=MAC_States.Contention
@@ -159,26 +159,26 @@ class MacCsmaRTS_CTS(GenericMac):
             #if the message was for another node
             else:                
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
-                    print(f"Node{self.componentinstancenumber}: Received RTS_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
+                    #print(f"Node{self.componentinstancenumber}: Received RTS_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     self.STATE=MAC_States.Blocked
                     self.Timer =Timer(self.NAV_RTS,self.Timer_func)
                     self.Timer.start()
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.CTS):
-                    print(f"Node{self.componentinstancenumber}: Received CTS_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
+                    #print(f"Node{self.componentinstancenumber}: Received CTS_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     self.STATE=MAC_States.Blocked
                     self.Timer =Timer(self.NAV_CTS,self.Timer_func)
                     self.Timer.start()
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.DATA):
-                    print(f"Node{self.componentinstancenumber}: Received DATA_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")     
+                    #print(f"Node{self.componentinstancenumber}: Received DATA_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")     
                     self.STATE=MAC_States.Blocked
                     self.Timer =Timer(self.NAV_DATA,self.Timer_func)
                     self.Timer.start()
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
                     self.STATE=MAC_States.Contention
-                    print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
+                    #print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         elif self.STATE==MAC_States.Contention:
-                print(f"Node{self.componentinstancenumber}: in contention")
+                #print(f"Node{self.componentinstancenumber}: in contention")
                 self.STATE=MAC_States.Blocked
                 self.Timer.cancel()
                 contention_selected=random.randrange(math.pow(2,self.contention_backoff))              
@@ -190,14 +190,12 @@ class MacCsmaRTS_CTS(GenericMac):
                 if self.retrial_counter > self.retry_max:                   
                     self.retrial_counter=0
                     eventobj=self.framequeue.get()
-                    print(f"Node{self.componentinstancenumber}, Droping a packet destined for Node{eventobj.eventcontent.header.messageto} since max retry is reached ")
+                    #print(f"Node{self.componentinstancenumber}, Droping a packet destined for Node{eventobj.eventcontent.header.messageto} since max retry is reached ")
                     evt = Event(self, EventTypes.MFRB, eventobj.eventcontent)
                     evt.eventcontent.header.messagefrom = -1
                     self.send_up(evt)
                 else:
-                     #print("handle_frame", "queue not empty")
                     clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
-                    #print("Component:", self.componentinstancenumber, "clear mi=", clearmi, " Power=", powerdb)
                     if  clearmi == True:
                         #Wait DIFS then sense again
                         time.sleep(self.slot_time/2)
@@ -208,9 +206,9 @@ class MacCsmaRTS_CTS(GenericMac):
                                 #Peak at the foremost message and construct a RTS message
                                 eventobj = self.framequeue.queue[0]
                                 message_size = getsizeof(eventobj.eventcontent.payload)
-                                print("Size of the message is", message_size, "Retry count: ",self.retrial_counter)
+                                #print("Size of the message is", message_size, "Retry count: ",self.retrial_counter)
                                 if(message_size>self.message_threshold):
-                                    print(f"Node{self.componentinstancenumber}, Sending RTS to {eventobj.eventcontent.header.messageto} ")
+                                    #print(f"Node{self.componentinstancenumber}, Sending RTS to {eventobj.eventcontent.header.messageto} ")
                                     hdr = GenericMessageHeader(MACLayerMessageTypes.RTS,self.componentinstancenumber,eventobj.eventcontent.header.messageto)
                                     RTS_message = GenericMessage(hdr, None)
                                     RTS_evt = Event(self, EventTypes.MFRT, RTS_message)                                                       
@@ -221,7 +219,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                     self.Timer.start()
                                     self.send_down(RTS_evt)
                                 else:
-                                    print(f"Node{self.componentinstancenumber}: Sending DATA to {eventobj.eventcontent.header.messageto} ")
+                                    #print(f"Node{self.componentinstancenumber}: Sending DATA to {eventobj.eventcontent.header.messageto} ")
                                     hdr = GenericMessageHeader(MACLayerMessageTypes.DATA,self.componentinstancenumber,eventobj.eventcontent.header.messageto)                           
                                     DATA_message = GenericMessage(hdr, eventobj)
                                     DATA_evt = Event(self, EventTypes.MFRT, DATA_message)    
@@ -232,7 +230,8 @@ class MacCsmaRTS_CTS(GenericMac):
                                     self.Timer.start()
                                     self.send_down(DATA_evt)
                             except Exception as e:
-                                print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
+                                pass
+                                #print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
                         else:
                             if(self.back_off_counter<self.back_off_max):
                                 self.back_off_counter = self.back_off_counter + 1
