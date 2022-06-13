@@ -41,6 +41,10 @@ class UsrpApplicationLayer(GenericModel):
         self.received_data_counter = 0
         self.sent_ack_counter = 0
         self.received_ack_counter = 0
+        self.ACK_sequence_list = []
+        self.Data_sequence_list = []
+        for i in range(number_of_nodes):
+            self.Data_sequence_list.append(-1)
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
         #new event handler for packet generation, same otherwise
@@ -56,18 +60,23 @@ class UsrpApplicationLayer(GenericModel):
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
             #Generate and send the ACK message (paylod is the same as original message) to the sender
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
-                self.received_data_counter += 1
+                if(self.Data_sequence_list[eventobj.eventcontent.header.messagefrom]<eventobj.eventcontent.header.sequencenumber):
+                    self.Data_sequence_list[eventobj.eventcontent.header.messagefrom]=eventobj.eventcontent.header.sequencenumber
+                    self.received_data_counter += 1
                 #Print the received DATA message content
                 #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom} {eventobj.eventcontent.payload}")
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
-                evt.eventcontent.payload ="ACK_MSG"
+                evt.eventcontent.payload = "ACK_MSG"
                 self.send_down(evt)  # Send the ACK
                 self.sent_ack_counter += 1
             #Print the message content if you receive an ACK message and increase the counter   
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
-                self.received_ack_counter += 1
+                #check if the ack is duplicate for not
+                if self.ACK_sequence_list [eventobj.eventcontent.header.sequencenumber]==False:
+                    self.ACK_sequence_list [eventobj.eventcontent.header.sequencenumber]=True
+                    self.received_ack_counter += 1
                 #print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
             else:
                 print(f"Unidentified message type")  
@@ -78,8 +87,9 @@ class UsrpApplicationLayer(GenericModel):
         destination_node = random.randint(0,number_of_nodes-1)
         while destination_node == self.componentinstancenumber:
             destination_node = random.randint(0,number_of_nodes-1)
-        hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
-        self.sent_data_counter += 1       
+        hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node,sequencenumber=self.sent_data_counter)
+        self.sent_data_counter += 1
+        self.ACK_sequence_list.append(False)
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber) + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
         #print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
