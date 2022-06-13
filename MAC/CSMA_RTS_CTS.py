@@ -55,7 +55,7 @@ class MacCsmaRTS_CTS(GenericMac):
         self.cca_threshold = configurationparameters.cca_threshold
         
         self.contention_backoff = 3
-        self.initial_backoff = 0
+        self.initial_backoff = 2
         self.retry_max=4
         #initial back_off is 0
         self.back_off_counter =self.initial_backoff
