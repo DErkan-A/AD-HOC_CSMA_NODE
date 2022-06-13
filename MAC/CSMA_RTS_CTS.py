@@ -139,6 +139,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     ACK_evt = Event(self, EventTypes.MFRT, ACK_message)
                     self.send_down(ACK_evt)          
                     self.sent_ACK_counter += 1
+                    self.STATE=MAC_States.Blocked
                     self.Timer =Timer(self.NAV_DATA,self.Timer_func)
                     self.Timer.start()
                     evt = Event(self, EventTypes.MFRB, eventobj.eventcontent.payload.eventcontent)
