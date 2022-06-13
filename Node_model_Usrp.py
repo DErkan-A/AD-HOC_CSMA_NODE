@@ -23,7 +23,7 @@ from adhoccomputing.Networking.LogicalChannels.GenericChannel import FIFOBroadca
 
 #framers = FramerObjects()
 
-number_of_nodes = 3
+number_of_nodes = 4
 
 # Message types that will be carried in eventcontent header
 class ApplicationLayerMessageTypes(Enum):
@@ -166,7 +166,7 @@ def main():
     #topo.construct_winslab_topology_with_channels(number_of_nodes, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
-    run_test(topo,0.1,number_of_nodes,5,15)
+    run_test(topo,0.1,number_of_nodes,100,200)
 
 if __name__ == "__main__":
     main()
