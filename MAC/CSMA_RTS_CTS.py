@@ -211,7 +211,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                 #Peak at the foremost message and construct a RTS message
                                 eventobj = self.framequeue.queue[0]
                                 message_size = getsizeof(eventobj.eventcontent.payload)
-                                print("Size of the message is", message_size)
+                                print("Size of the message is", message_size, "Retry count: ",self.retrial_counter)
                                 if(message_size>self.message_threshold):
                                     print(f"Node{self.componentinstancenumber}, Sending RTS to {eventobj.eventcontent.header.messageto} ")
                                     hdr = GenericMessageHeader(MACLayerMessageTypes.RTS,self.componentinstancenumber,eventobj.eventcontent.header.messageto)
