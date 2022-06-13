@@ -82,8 +82,9 @@ class MacCsmaRTS_CTS(GenericMac):
         #print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
     def Timer_func(self):
-        self.contention_counter=0
         self.STATE = MAC_States.Contention
+    def Timer_func_contention(self):
+        self.STATE =  MAC_States.IDLE    
 
     def on_message_from_top(self, eventobj: Event):
         # put message in queue and try accessing the channel
@@ -149,7 +150,6 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.received_ACK_counter += 1
                     #Even if we are the one to receive the ACK we move on to the contention rather than idle
                     self.STATE=MAC_States.Contention
-                    self.contention_counter=0
                     self.back_off_counter = self.initial_backoff
                     self.retrial_counter=0
                     #Deque the packet
@@ -175,19 +175,13 @@ class MacCsmaRTS_CTS(GenericMac):
                     self.Timer.start()
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
                     self.STATE=MAC_States.Contention
-                    self.contention_counter=0
                     print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         elif self.STATE==MAC_States.Contention:
-            if(self.contention_counter==0):
-                print(f"Node{self.componentinstancenumber}, in contention")
-                self.contention_selected=random.randint(0,math.pow(2,self.contention_backoff))
-            if(self.contention_counter<self.contention_selected):
-                self.contention_counter+=1
-                time.sleep(self.slot_time)
-            else:
-                self.STATE=MAC_States.IDLE
-
+                self.STATE=MAC_States.Blocked
+                contention_selected=random.randint(0,math.pow(2,self.contention_backoff))
+                self.Timer =Timer(contention_selected*self.slot_time,self.Timer_func_contention)               
+                self.Timer.start()
         elif self.framequeue.qsize() > 0:
             if self.STATE==MAC_States.IDLE:
                 #If we exceed the maximum retry count for a packet drop it and send the packet with -1 message_from to the top
