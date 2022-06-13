@@ -56,7 +56,7 @@ class MacCsmaRTS_CTS(GenericMac):
         
         self.contention_backoff = 3
         self.initial_backoff = 2
-        self.retry_max=4
+        self.retry_max=6
 
     
     #on_init will be called from topo.start to initialize components
