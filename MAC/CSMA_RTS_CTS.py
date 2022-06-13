@@ -179,7 +179,8 @@ class MacCsmaRTS_CTS(GenericMac):
                     #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         elif self.STATE==MAC_States.Contention:
                 self.STATE=MAC_States.Blocked
-                contention_selected=random.randint(0,math.pow(2,self.contention_backoff))
+                contention_selected=random.randrange(math.pow(2,self.contention_backoff))
+                self.Timer.cancel()
                 self.Timer =Timer(contention_selected*self.slot_time,self.Timer_func_contention)               
                 self.Timer.start()
         elif self.framequeue.qsize() > 0:
@@ -198,10 +199,11 @@ class MacCsmaRTS_CTS(GenericMac):
                     #print("Component:", self.componentinstancenumber, "clear mi=", clearmi, " Power=", powerdb)
                     if  clearmi == True:
                         #Wait DIFS then sense again
-                        time.sleep(self.slot_time)
+                        time.sleep(self.slot_time/2)
                         clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                         if  clearmi == True:                  
                             try:
+                                self.Timer.cancel()
                                 #Peak at the foremost message and construct a RTS message
                                 eventobj = self.framequeue.queue[0]
                                 message_size = getsizeof(eventobj.eventcontent.payload)
@@ -232,12 +234,20 @@ class MacCsmaRTS_CTS(GenericMac):
                                 print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
                         else:
                             if(self.back_off_counter<self.back_off_max):
-                                self.retback_off_counterrialcnt = self.back_off_counter + 1
-                            time.sleep(random.randrange(0,math.pow(2,self.back_off_counter))*self.slot_time)
+                                self.back_off_counter = self.back_off_counter + 1
+                            self.STATE=MAC_States.Blocked
+                            self.Timer.cancel()
+                            backoff_selected=random.randrange(math.pow(2,self.back_off_counter))
+                            self.Timer =Timer(backoff_selected*self.slot_time,self.Timer_func_contention)               
+                            self.Timer.start()
                     else:
                         if(self.back_off_counter<self.back_off_max):
-                            self.retback_off_counterrialcnt = self.back_off_counter + 1
-                        time.sleep(random.randrange(0,math.pow(2,self.back_off_counter))*self.slot_time)
+                            self.back_off_counter = self.back_off_counter + 1
+                        self.STATE=MAC_States.Blocked
+                        self.Timer.cancel()
+                        backoff_selected=random.randrange(math.pow(2,self.back_off_counter))
+                        self.Timer =Timer(backoff_selected*self.slot_time,self.Timer_func_contention)               
+                        self.Timer.start()
                                    
         else:
             pass           
