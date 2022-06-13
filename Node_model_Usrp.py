@@ -62,7 +62,7 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.header.messagetype = ApplicationLayerMessageTypes.ACK   
                 evt.eventcontent.header.messageto = eventobj.eventcontent.header.messagefrom
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
-                evt.eventcontent.payload =eventobj.eventcontent.payload
+                evt.eventcontent.payload ="ACK_MSG"
                 self.send_down(evt)  # Send the ACK
                 self.sent_ack_counter += 1
             #Print the message content if you receive an ACK message and increase the counter   
@@ -80,7 +80,7 @@ class UsrpApplicationLayer(GenericModel):
             destination_node = random.randint(0,number_of_nodes-1)
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node)
         self.sent_data_counter += 1       
-        payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber)
+        payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber) + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
         #print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
