@@ -54,12 +54,12 @@ class MacCsmaRTS_CTS(GenericMac):
         self.message_threshold=configurationparameters.message_threshold
         self.cca_threshold = configurationparameters.cca_threshold
         
-        self.contention_backoff = 3
-        self.initial_backoff = 2
-        self.retry_max=6
+        self.contention_backoff = 4
+        self.initial_backoff = 3
+        self.retry_max=4
         #initial back_off is 0
         self.back_off_counter =self.initial_backoff
-        self.back_off_max = 4
+        self.back_off_max = 5
         self.retrial_counter = 0
         self.STATE = MAC_States.IDLE
         
