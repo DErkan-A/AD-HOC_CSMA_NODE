@@ -99,8 +99,10 @@ class MacCsmaRTS_CTS(GenericMac):
         if self.received_framequeue.qsize()>0:
             while self.received_framequeue.qsize()>0:
                 eventobj = self.received_framequeue.get()
-            evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)  
-            if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
+            evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
+            if self.componentinstancenumber == eventobj.eventcontent.header.messagefrom:
+                pass # We do not want loopback
+            elif self.componentinstancenumber == eventobj.eventcontent.header.messageto:
                 self.Timer.cancel()
                 #Generate and send the ACK message (paylod is the same as original message) to the sender
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
