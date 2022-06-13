@@ -184,7 +184,7 @@ class MacCsmaRTS_CTS(GenericMac):
                 self.contention_selected=random.randint(0,math.pow(2,self.contention_backoff))
             if(self.contention_counter<self.contention_selected):
                 self.contention_counter+=1
-                time.sleep(self.slot_time/2)
+                time.sleep(self.slot_time)
             else:
                 self.STATE=MAC_States.IDLE
 
@@ -247,5 +247,5 @@ class MacCsmaRTS_CTS(GenericMac):
                                    
         else:
             pass           
-        time.sleep(self.slot_time/10) # TODO: Think about this otherwise we will only do cca
+        time.sleep(self.slot_time/100) # TODO: Think about this otherwise we will only do cca
         self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None)) #Continuously trigger handle_frame
