@@ -91,6 +91,7 @@ class UsrpApplicationLayer(GenericModel):
         self.sent_data_counter += 1
         self.ACK_sequence_list.append(False)
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber) + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
+        payload = payload + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
         #print("size of payload is:",sys.getsizeof(payload))
         broadcastmessage = GenericMessage(hdr, payload)
         evt = Event(self, EventTypes.MFRT, broadcastmessage)
