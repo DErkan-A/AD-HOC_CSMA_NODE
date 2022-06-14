@@ -39,7 +39,6 @@ class UsrpApplicationLayer(GenericModel):
     def on_init(self, eventobj: Event):
         self.sent_data_counter = 0
         self.received_data_counter = 0
-        self.sent_ack_counter = 0
         self.received_ack_counter = 0
         self.ACK_sequence_list = []
         self.Data_sequence_list = []
@@ -70,7 +69,6 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload = "ACK_MSG"
                 self.send_down(evt)  # Send the ACK
-                self.sent_ack_counter += 1
             #Print the message content if you receive an ACK message and increase the counter   
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 #check if the ack is duplicate for not
@@ -164,7 +162,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
     for node in range(number_of_nodes):
         node = my_topology.nodes[node].appl
         total_data_sent +=node.sent_data_counter
-        total_ack_sent +=node.sent_ack_counter
+        total_ack_sent +=node.received_data_counter
         total_data_received += node.received_data_counter
         total_ack_received +=node.received_ack_counter
         print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
