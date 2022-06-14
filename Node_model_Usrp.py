@@ -33,6 +33,7 @@ class UsrpApplicationLayer(GenericModel):
     def on_init(self, eventobj: Event):
         self.sent_data_counter = 0
         self.received_data_counter = 0
+        self.received_ack_counter=0
         #Lists for DATA and ACK to not count duplicate packets
         self.ACK_sequence_list = []
         self.Data_sequence_list = []
