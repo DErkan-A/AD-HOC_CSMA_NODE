@@ -62,7 +62,8 @@ class MacCsmaRTS_CTS(GenericMac):
         self.back_off_max = 4
         self.retrial_counter = 0
         self.STATE = MAC_States.IDLE
-        
+        self.send_flag=False
+
         self.Timer = Timer(self.NAV_CTS,self.Timer_func)
         #Statistic variables
         self.sent_DATA_counter = 0
@@ -83,7 +84,9 @@ class MacCsmaRTS_CTS(GenericMac):
     def Timer_func(self):
         self.STATE = MAC_States.Contention
     def Timer_func_contention(self):
-        self.STATE =  MAC_States.IDLE    
+        self.STATE =  MAC_States.IDLE
+    def Timer_send_clear(self):
+        self.send_flag=True        
 
     def on_message_from_top(self, eventobj: Event):
         # put message in queue and try accessing the channel
@@ -100,6 +103,7 @@ class MacCsmaRTS_CTS(GenericMac):
         ##print("handle_frame")
         #If we received frames from other nodes we must first check them
         if self.received_framequeue.qsize()>0:
+            self.send_flag=False
             while self.received_framequeue.qsize()>0:
                 eventobj = self.received_framequeue.get()
             evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
@@ -178,6 +182,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     #print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
                     #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
         elif self.STATE==MAC_States.Contention:
+                self.send_flag=False
                 #print(f"Node{self.componentinstancenumber}: in contention")
                 self.STATE=MAC_States.Blocked
                 self.Timer.cancel()
@@ -198,9 +203,11 @@ class MacCsmaRTS_CTS(GenericMac):
                     clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                     if  clearmi == True:
                         #Wait DIFS then sense again
-                        time.sleep(self.slot_time)
-                        clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
-                        if  clearmi == True:                  
+                        if not self.send_flag:
+                            self.Timer =Timer(self.slot_time/2,self.Timer_send_clear)
+                            self.Timer.start()
+                        else:
+                            self.send_flag=False             
                             try:
                                 self.Timer.cancel()
                                 #Peak at the foremost message and construct a RTS message
@@ -232,14 +239,6 @@ class MacCsmaRTS_CTS(GenericMac):
                             except Exception as e:
                                 pass
                                 #print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
-                        else:
-                            if(self.back_off_counter<self.back_off_max):
-                                self.back_off_counter = self.back_off_counter + 1
-                            self.STATE=MAC_States.Blocked
-                            self.Timer.cancel()
-                            backoff_selected=random.randrange(math.pow(2,self.back_off_counter))
-                            self.Timer =Timer(backoff_selected*self.slot_time,self.Timer_func_contention)               
-                            self.Timer.start()
                     else:
                         if(self.back_off_counter<self.back_off_max):
                             self.back_off_counter = self.back_off_counter + 1
