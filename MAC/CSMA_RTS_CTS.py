@@ -33,7 +33,7 @@ class ComponentConfigurationParameters():
 
 #Configuration parameters
 class MacCsmaRTS_CTS_ConfigurationParameters (ComponentConfigurationParameters):
-    def __init__(self, slot_time = 0.05, NAV_RTS = 0.2, NAV_CTS = 0.15, NAV_DATA = 0.1, message_threshold=100, cca_threshold = -35):
+    def __init__(self, slot_time = 0.05, NAV_RTS = 0.15, NAV_CTS = 0.10, NAV_DATA = 0.05, message_threshold=100, cca_threshold = -35):
         self.slot_time = slot_time
         self.NAV_RTS = NAV_RTS
         self.NAV_CTS = NAV_CTS
@@ -60,7 +60,7 @@ class MacCsmaRTS_CTS(GenericMac):
         #Exponential Contention backoff constant
         self.contention_backoff = 3
         #Initial backoff constant when channel sensed busy
-        self.initial_backoff = 2
+        self.initial_backoff = 1
         self.retry_max=4
         self.back_off_counter =self.initial_backoff
         self.back_off_max = 4
@@ -126,7 +126,8 @@ class MacCsmaRTS_CTS(GenericMac):
                     evt.eventcontent.header.messagefrom = self.componentinstancenumber
                     evt.eventcontent.payload = None
                     self.STATE=MAC_States.Blocked
-                    self.Timer =Timer(self.NAV_RTS,self.Timer_func)
+                    #self.Timer =Timer(self.NAV_RTS,self.Timer_func)
+                    self.Timer =Timer(self.NAV_DATA,self.Timer_func)
                     self.Timer.start()
                     self.send_down(evt)  # Send the CTS
                 
@@ -139,7 +140,8 @@ class MacCsmaRTS_CTS(GenericMac):
                     DATA_message = GenericMessage(hdr, payload)
                     DATA_evt = Event(self, EventTypes.MFRT, DATA_message)                
                     self.STATE = MAC_States.ACK_pending
-                    self.Timer =Timer(self.NAV_CTS,self.Timer_func)
+                    #self.Timer =Timer(self.NAV_CTS,self.Timer_func)
+                    self.Timer =Timer(self.NAV_DATA,self.Timer_func)
                     self.Timer.start()
                     self.send_down(DATA_evt)
 
