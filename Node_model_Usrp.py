@@ -189,7 +189,7 @@ def main():
     #topo.construct_winslab_topology_with_channels(number_of_nodes, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
-    run_test(topo,0.01,number_of_nodes,10)
+    run_test(topo,0.01,number_of_nodes,200)
 
 if __name__ == "__main__":
     main()
