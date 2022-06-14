@@ -106,15 +106,15 @@ class UsrpNode(GenericModel):
         # SUBCOMPONENTS
         
         #Configure the p-persisten MAC
-        #macconfig = MacCsmaPPersistentConfigurationParameters(0.5,-51)
-        macconfig = MacCsmaRTS_CTS_ConfigurationParameters(cca_threshold=-51)
+        macconfig = MacCsmaPPersistentConfigurationParameters(0.5,-51)
+        #macconfig = MacCsmaRTS_CTS_ConfigurationParameters(cca_threshold=-51)
         sdrconfig = SDRConfiguration(freq =2484000000.0, bandwidth = 20000000, chan = 0, hw_tx_gain = 76, hw_rx_gain = 20, sw_tx_gain = -12.0)
 
         self.appl = UsrpApplicationLayer("UsrpApplicationLayer", componentinstancenumber, topology=topology)
-        #self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
-        #self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, sdr=self.phy.sdrdev,topology=topology)
-        self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber,usrpconfig=sdrconfig, topology=topology)
-        self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, sdr=self.phy.sdrdev,topology=topology)
+        self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber, topology=topology)
+        self.mac = MacCsmaPPersistent("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, sdr=self.phy.sdrdev,topology=topology)
+        #self.phy = UsrpB210OfdmFlexFramePhy("UsrpB210OfdmFlexFramePhy", componentinstancenumber,usrpconfig=sdrconfig, topology=topology)
+        #self.mac = MacCsmaRTS_CTS("MacCsmaPPersistent", componentinstancenumber,  configurationparameters=macconfig, sdr=self.phy.sdrdev,topology=topology)
         
         self.components.append(self.appl)
         self.components.append(self.phy)
@@ -187,7 +187,7 @@ def main():
     #topo.construct_winslab_topology_with_channels(number_of_nodes, UsrpNode, FIFOBroadcastPerfectChannel)
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
-    run_test(topo,1,number_of_nodes,200)
+    run_test(topo,0.01,number_of_nodes,200)
 
 if __name__ == "__main__":
     main()
