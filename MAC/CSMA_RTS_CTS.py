@@ -198,7 +198,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                     if  clearmi == True:
                         #Wait DIFS then sense again
-                        time.sleep(self.slot_time/2)
+                        time.sleep(self.slot_time)
                         clearmi, powerdb  = self.sdrdev.ischannelclear(threshold=self.cca_threshold)
                         if  clearmi == True:                  
                             try:
