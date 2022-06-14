@@ -17,12 +17,6 @@ from adhoccomputing.Networking.PhysicalLayer.UsrpB210OfdmFlexFramePhy import  Us
 from adhoccomputing.Networking.MacProtocol.CSMA import MacCsmaPPersistent, MacCsmaPPersistentConfigurationParameters
 from adhoccomputing.Networking.LogicalChannels.GenericChannel import FIFOBroadcastPerfectChannel
 
-#registry = ComponentRegistry()
-#from ahc.Channels.Channels import FIFOBroadcastPerfectChannel
-#from ahc.EttusUsrp.UhdUtils import AhcUhdUtils
-
-#framers = FramerObjects()
-
 number_of_nodes = 4
 
 # Message types that will be carried in eventcontent header
@@ -39,7 +33,7 @@ class UsrpApplicationLayer(GenericModel):
     def on_init(self, eventobj: Event):
         self.sent_data_counter = 0
         self.received_data_counter = 0
-        self.received_ack_counter = 0
+        #Lists for DATA and ACK to not count duplicate packets
         self.ACK_sequence_list = []
         self.Data_sequence_list = []
         for i in range(number_of_nodes):
@@ -54,10 +48,10 @@ class UsrpApplicationLayer(GenericModel):
     
     def on_message_from_bottom(self, eventobj: Event):
         evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
-        #print(f"Node.{self.componentinstancenumber}, received DATA from Node.{eventobj.eventcontent.header.messagefrom}: {eventobj.eventcontent.payload}")
-        #If the message was targetting this node        
+
+        #Check if the message was for this node (unnecessary when using CSMA with RTS/CTS)
         if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
-            #Generate and send the ACK message (paylod is the same as original message) to the sender
+            #Generate and send the ACK message to reply
             if(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.DATA):
                 if(self.Data_sequence_list[eventobj.eventcontent.header.messagefrom]<eventobj.eventcontent.header.sequencenumber):
                     self.Data_sequence_list[eventobj.eventcontent.header.messagefrom]=eventobj.eventcontent.header.sequencenumber
@@ -69,13 +63,14 @@ class UsrpApplicationLayer(GenericModel):
                 evt.eventcontent.header.messagefrom = self.componentinstancenumber
                 evt.eventcontent.payload = "ACK_MSG"
                 self.send_down(evt)  # Send the ACK
-            #Print the message content if you receive an ACK message and increase the counter   
+            #Count the ACK messages    
             elif(eventobj.eventcontent.header.messagetype == ApplicationLayerMessageTypes.ACK):
                 #check if the ack is duplicate for not
                 if self.ACK_sequence_list [eventobj.eventcontent.header.sequencenumber]==False:
                     self.ACK_sequence_list [eventobj.eventcontent.header.sequencenumber]=True
                     self.received_ack_counter += 1
                 #print(f"Node.{self.componentinstancenumber}, received ACK from Node.{eventobj.eventcontent.header.messagefrom} For: {eventobj.eventcontent.payload}")
+            #IF an unidentified message comes print for feedback    
             else:
                 print(f"Unidentified message type")  
 
@@ -85,8 +80,10 @@ class UsrpApplicationLayer(GenericModel):
         destination_node = random.randint(0,number_of_nodes-1)
         while destination_node == self.componentinstancenumber:
             destination_node = random.randint(0,number_of_nodes-1)
+        #Create the packet    
         hdr = GenericMessageHeader(ApplicationLayerMessageTypes.DATA,self.componentinstancenumber , destination_node,sequencenumber=self.sent_data_counter)
         self.sent_data_counter += 1
+        #Add entry for the ACK of this packet to come
         self.ACK_sequence_list.append(False)
         payload = "Message" + str(self.sent_data_counter) + " from NODE-" + str(self.componentinstancenumber) + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
         payload = payload + "PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING PADDING"
@@ -139,7 +136,7 @@ class UsrpNode(GenericModel):
 def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
     print("Testing with inter frame waiting time:",wait_time, " number of nodes",number_of_nodes," number of messages:",number_of_messages)
     i = 0
-    #test for only 1 random node sending a message to another random node with waiting between messages, this basically tests failure rate
+    #Tests messages between random nodes, messages are sent through the application with given wait_time inbetween
     print("Reporting the overall statistics")
     start_time=time.time()
     while(i < number_of_messages):
@@ -147,6 +144,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
         my_topology.nodes[random_node].appl.send_self(Event(my_topology.nodes[random_node], UsrpApplicationLayerEventTypes.STARTBROADCAST, None))
         time.sleep(wait_time)
         i = i + 1
+    #Don't stop untill all the mac layers finished sending everything    
     running_flag=True
     while running_flag:
         time.sleep(1)
@@ -154,6 +152,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
         for i in range(number_of_nodes):
             if my_topology.nodes[i].mac.framequeue.qsize()>0:
                 running_flag=True
+    #Calculate and print various statistics of the test            
     run_time=time.time()-start_time
     total_data_sent = 0
     total_ack_sent = 0
@@ -188,6 +187,7 @@ def main():
     topo.construct_winslab_topology_without_channels(number_of_nodes, UsrpNode)
     topo.start()
     run_test(topo,0.1,number_of_nodes,200)
+    topo.exit()
 
 if __name__ == "__main__":
     main()
