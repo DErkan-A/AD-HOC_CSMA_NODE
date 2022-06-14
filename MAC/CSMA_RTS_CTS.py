@@ -31,12 +31,14 @@ class MAC_States(Enum):
 class ComponentConfigurationParameters():
     pass
 
+#Configuration parameters
 class MacCsmaRTS_CTS_ConfigurationParameters (ComponentConfigurationParameters):
     def __init__(self, slot_time = 0.05, NAV_RTS = 0.2, NAV_CTS = 0.15, NAV_DATA = 0.1, message_threshold=100, cca_threshold = -35):
         self.slot_time = slot_time
         self.NAV_RTS = NAV_RTS
         self.NAV_CTS = NAV_CTS
         self.NAV_DATA = NAV_DATA
+        #Messages larger than this threshold will use RTS, others will use DATA directly
         self.message_threshold=message_threshold
         self.cca_threshold = cca_threshold
 
@@ -54,7 +56,10 @@ class MacCsmaRTS_CTS(GenericMac):
         self.message_threshold=configurationparameters.message_threshold
         self.cca_threshold = configurationparameters.cca_threshold
         
+        #Various timing specifications
+        #Exponential Contention backoff constant
         self.contention_backoff = 3
+        #Initial backoff constant when channel sensed busy
         self.initial_backoff = 2
         self.retry_max=4
         self.back_off_counter =self.initial_backoff
@@ -64,7 +69,7 @@ class MacCsmaRTS_CTS(GenericMac):
         self.send_flag=False
 
         self.Timer = Timer(self.NAV_CTS,self.Timer_func)
-        #Statistic variables
+        #Statistic variables, unused for now
         self.sent_DATA_counter = 0
         self.received_DATA_counter = 0
         self.sent_ACK_counter = 0
@@ -80,6 +85,7 @@ class MacCsmaRTS_CTS(GenericMac):
         super().on_init(eventobj)  # required because of inheritence
         ##print("Initialized", self.componentname, ":", self.componentinstancenumber)
    
+    #Various timer functions, called from different parts but at maximum only 1 timer is active at any given time
     def Timer_func(self):
         self.STATE = MAC_States.Contention
     def Timer_func_contention(self):
@@ -88,10 +94,11 @@ class MacCsmaRTS_CTS(GenericMac):
         self.send_flag=True        
 
     def on_message_from_top(self, eventobj: Event):
-        # put message in queue and try accessing the channel
+        # put message in queue
         self.framequeue.put_nowait(eventobj)      
 
     def on_message_from_bottom(self, eventobj: Event):
+        # put message in queue if not loopback message
         if eventobj.eventcontent.header.messagefrom==self.componentinstancenumber:
             pass
         else:    
@@ -103,10 +110,12 @@ class MacCsmaRTS_CTS(GenericMac):
         #If we received frames from other nodes we must first check them
         if self.received_framequeue.qsize()>0:
             self.send_flag=False
+            #Only consider the last message received
             while self.received_framequeue.qsize()>0:
                 eventobj = self.received_framequeue.get()
             evt = Event(self, EventTypes.MFRT, eventobj.eventcontent)
             self.Timer.cancel()
+            #If the destination node was this node
             if self.componentinstancenumber == eventobj.eventcontent.header.messageto:
                 #Send different messages depending on which message came
                 if(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.RTS):
@@ -179,7 +188,8 @@ class MacCsmaRTS_CTS(GenericMac):
                 elif(eventobj.eventcontent.header.messagetype == MACLayerMessageTypes.ACK):
                     self.STATE=MAC_States.Contention
                     #print(f"Node{self.componentinstancenumber}: Received ACK_{eventobj.eventcontent.header.messagefrom}_{eventobj.eventcontent.header.messageto} ")
-                    #If we just exited blocked state because of someone elses RTS/CTS do a special backoff
+
+        #Check if the node is in contention            
         elif self.STATE==MAC_States.Contention:
                 self.send_flag=False
                 #print(f"Node{self.componentinstancenumber}: in contention")
@@ -188,7 +198,9 @@ class MacCsmaRTS_CTS(GenericMac):
                 contention_selected=random.randrange(math.pow(2,self.contention_backoff))              
                 self.Timer =Timer(contention_selected*self.slot_time,self.Timer_func_contention)               
                 self.Timer.start()
+        #Check if there is a packet to send        
         elif self.framequeue.qsize() > 0:
+            #Only start the send logic if the state is IDLE
             if self.STATE==MAC_States.IDLE:
                 #If we exceed the maximum retry count for a packet drop it and send the packet with -1 message_from to the top
                 if self.retrial_counter > self.retry_max:                   
@@ -239,6 +251,7 @@ class MacCsmaRTS_CTS(GenericMac):
                                 pass
                                 #print("Node",self.componentinstancenumber, " MacCsma handle_frame exception, ", e)
                     else:
+                        #Exponential backoff to decrease collision probability after busy channel sensing
                         if(self.back_off_counter<self.back_off_max):
                             self.back_off_counter = self.back_off_counter + 1
                         self.STATE=MAC_States.Blocked
@@ -249,5 +262,5 @@ class MacCsmaRTS_CTS(GenericMac):
                                    
         else:
             pass           
-        time.sleep(self.slot_time/10) # TODO: Think about this otherwise we will only do cca
+        time.sleep(self.slot_time/10) # TODO: Can be improved?
         self.send_self(Event(self, GenericMacEventTypes.HANDLEMACFRAME, None)) #Continuously trigger handle_frame
