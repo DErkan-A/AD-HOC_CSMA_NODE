@@ -61,7 +61,7 @@ class MacCsmaRTS_CTS(GenericMac):
         self.contention_backoff = 3
         #Initial backoff constant when channel sensed busy
         self.initial_backoff = 1
-        self.retry_max=4
+        self.retry_max=6
         self.back_off_counter =self.initial_backoff
         self.back_off_max = 4
         self.retrial_counter = 0
