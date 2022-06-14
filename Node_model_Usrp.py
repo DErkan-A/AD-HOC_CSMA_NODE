@@ -165,7 +165,7 @@ def run_test(my_topology, wait_time, number_of_nodes, number_of_messages):
         total_ack_sent +=node.received_data_counter
         total_data_received += node.received_data_counter
         total_ack_received +=node.received_ack_counter
-        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.sent_ack_counter}, received.{node.received_ack_counter} ACKs")
+        print(f"Node.{node.componentinstancenumber}, sent.{node.sent_data_counter} Data, received.{node.received_data_counter} Data, ACKed.{node.received_data_counter}, received.{node.received_ack_counter} ACKs")
 
     data_fail_rate = 1-(total_data_received / total_data_sent)
     ack_fail_rate = 1-(total_ack_received/total_ack_sent) 
