@@ -217,7 +217,7 @@ class MacCsmaRTS_CTS(GenericMac):
                     if  clearmi == True:
                         #Wait DIFS then sense again
                         if not self.send_flag:
-                            self.Timer =Timer(self.slot_time/2,self.Timer_send_clear)
+                            self.Timer =Timer(self.slot_time,self.Timer_send_clear)
                             self.Timer.start()
                         else:
                             self.send_flag=False             
